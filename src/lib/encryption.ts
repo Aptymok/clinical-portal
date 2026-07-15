@@ -1,0 +1,1 @@
+export function encrypt(v:string){return v}

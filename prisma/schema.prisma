@@ -1,0 +1,451 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  DOCTOR
+  NURSE
+  PATIENT
+  STAFF
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+  UNKNOWN
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  CANCELLED
+  COMPLETED
+  NO_SHOW
+}
+
+enum EncounterStatus {
+  PLANNED
+  IN_PROGRESS
+  FINISHED
+  CANCELLED
+}
+
+enum PrescriptionStatus {
+  DRAFT
+  ACTIVE
+  CANCELLED
+  COMPLETED
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime?
+  name          String?
+  passwordHash  String?
+  role          Role      @default(PATIENT)
+
+  personId String? @unique
+  person   Person? @relation(fields: [personId], references: [id])
+
+  accounts Account[]
+  sessions Session[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Account {
+  id     String @id @default(cuid())
+  userId String
+
+  type              String
+  provider          String
+  providerAccountId String
+
+  refresh_token String?
+  access_token  String?
+  expires_at    Int?
+
+  token_type    String?
+  scope         String?
+  id_token      String?
+  session_state String?
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Person {
+  id String @id @default(cuid())
+
+  firstName String
+  lastName  String
+
+  gender    Gender?
+  birthDate DateTime?
+
+  user User?
+
+  patients  Patient[]
+  providers Provider[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Patient {
+  id String @id @default(cuid())
+
+  personId String  @unique
+  mrn      String? @unique
+
+  primaryProviderId String?
+
+  person Person @relation(fields: [personId], references: [id])
+
+  primaryProvider Provider? @relation("PrimaryProvider", fields: [primaryProviderId], references: [id])
+
+  appointments  Appointment[]
+  encounters    Encounter[]
+  prescriptions Prescription[]
+  documents     Document[]
+  reminders     Reminder[]
+  labResults    LabResult[]
+  consents      Consent[]
+  aiInsights    AIInsight[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Provider {
+  id String @id @default(cuid())
+
+  personId  String  @unique
+  specialty String?
+
+  person Person @relation(fields: [personId], references: [id])
+
+  patients      Patient[]      @relation("PrimaryProvider")
+  appointments  Appointment[]
+  encounters    Encounter[]
+  prescriptions Prescription[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Appointment {
+  id String @id @default(cuid())
+
+  patientId  String
+  providerId String
+
+  scheduledFor DateTime
+
+  status AppointmentStatus @default(SCHEDULED)
+
+  reason String?
+  notes  String?
+
+  patient Patient @relation(fields: [patientId], references: [id])
+
+  provider Provider @relation(fields: [providerId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([patientId])
+  @@index([providerId])
+  @@index([scheduledFor])
+}
+
+model Encounter {
+  id String @id @default(cuid())
+
+  patientId  String
+  providerId String
+
+  startedAt DateTime  @default(now())
+  endedAt   DateTime?
+
+  status EncounterStatus @default(PLANNED)
+
+  reason String?
+  notes  String?
+
+  patient Patient @relation(fields: [patientId], references: [id])
+
+  provider Provider @relation(fields: [providerId], references: [id])
+
+  observations Observation[]
+  diagnoses    Diagnosis[]
+  aiInsights   AIInsight[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([patientId])
+  @@index([providerId])
+}
+
+model Observation {
+  id String @id @default(cuid())
+
+  encounterId String
+
+  type  String
+  value String
+  unit  String?
+
+  recordedAt DateTime @default(now())
+
+  encounter Encounter @relation(fields: [encounterId], references: [id])
+
+  @@index([encounterId])
+}
+
+model Diagnosis {
+  id String @id @default(cuid())
+
+  encounterId String
+
+  code    String
+  display String?
+
+  primary Boolean @default(false)
+
+  encounter Encounter @relation(fields: [encounterId], references: [id])
+
+  @@index([encounterId])
+}
+
+model MedicationCatalog {
+  id String @id @default(cuid())
+
+  code String  @unique
+  name String
+  form String?
+
+  medications Medication[]
+
+  createdAt DateTime @default(now())
+}
+
+model Medication {
+  id String @id @default(cuid())
+
+  catalogId String
+  strength  String?
+
+  catalog MedicationCatalog @relation(fields: [catalogId], references: [id])
+
+  prescriptionItems PrescriptionItem[]
+}
+
+model Prescription {
+  id String @id @default(cuid())
+
+  patientId  String
+  providerId String
+
+  status PrescriptionStatus @default(DRAFT)
+
+  issuedAt DateTime?
+
+  patient Patient @relation(fields: [patientId], references: [id])
+
+  provider Provider @relation(fields: [providerId], references: [id])
+
+  items PrescriptionItem[]
+
+  @@index([patientId])
+  @@index([providerId])
+}
+
+model PrescriptionItem {
+  id String @id @default(cuid())
+
+  prescriptionId String
+  medicationId   String
+
+  dose     String?
+  quantity Int?
+
+  prescription Prescription @relation(fields: [prescriptionId], references: [id])
+
+  medication Medication @relation(fields: [medicationId], references: [id])
+}
+
+model LabResult {
+  id String @id @default(cuid())
+
+  patientId String
+
+  testName String
+  result   String
+  unit     String?
+
+  recordedAt DateTime @default(now())
+
+  patient Patient @relation(fields: [patientId], references: [id])
+
+  @@index([patientId])
+}
+
+model Document {
+  id String @id @default(cuid())
+
+  patientId String
+
+  key  String  @unique
+  hash String? @unique
+
+  url      String?
+  metadata Json?
+
+  uploadedAt DateTime @default(now())
+
+  patient Patient @relation(fields: [patientId], references: [id])
+
+  @@index([patientId])
+}
+
+model Consent {
+  id String @id @default(cuid())
+
+  patientId String
+
+  scope String
+
+  granted   Boolean  @default(true)
+  grantedAt DateTime @default(now())
+
+  patient Patient @relation(fields: [patientId], references: [id])
+
+  @@index([patientId])
+}
+
+model Reminder {
+  id String @id @default(cuid())
+
+  patientId String
+
+  message String
+  at      DateTime
+
+  sent Boolean @default(false)
+
+  patient Patient @relation(fields: [patientId], references: [id])
+
+  @@index([patientId])
+}
+
+model AuditLog {
+  id String @id @default(cuid())
+
+  actorId String?
+
+  action String
+
+  resource   String?
+  resourceId String?
+
+  requestId String?
+
+  ip        String?
+  userAgent String?
+
+  status String?
+
+  meta Json?
+
+  createdAt DateTime @default(now())
+}
+
+model DomainEvent {
+  id String @id @default(cuid())
+
+  type    String
+  payload Json
+
+  createdAt DateTime @default(now())
+}
+
+model AIInsight {
+  id String @id @default(cuid())
+
+  patientId   String?
+  encounterId String?
+
+  model String
+
+  prompt String
+  output Json
+
+  createdAt DateTime @default(now())
+
+  patient Patient? @relation(fields: [patientId], references: [id])
+
+  encounter Encounter? @relation(fields: [encounterId], references: [id])
+
+  @@index([patientId])
+  @@index([encounterId])
+}
+
+model ResearchDataset {
+  id String @id @default(cuid())
+
+  name String
+
+  versions ResearchDatasetVersion[]
+}
+
+model ResearchDatasetVersion {
+  id String @id @default(cuid())
+
+  datasetId String
+
+  version String
+
+  files Json?
+
+  dataset ResearchDataset @relation(fields: [datasetId], references: [id])
+}
+
+model ClinicSettings {
+  id String @id @default("default")
+
+  name String
+
+  timezone String @default("America/Mexico_City")
+
+  businessHours Json
+
+  appointmentDuration Int @default(30)
+
+  branding Json?
+
+  features Json
+
+  updatedAt DateTime @updatedAt
+
+  @@map("clinic_settings")
+}

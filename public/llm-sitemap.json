@@ -1,0 +1,13 @@
+{
+  "generatedAt": "2026-07-15T00:00:00Z",
+  "site": "/",
+  "routes": [
+    {"path":"/","method":"GET","description":"Landing / Dashboard"},
+    {"path":"/login","method":"GET","description":"Login page"},
+    {"path":"/api/auth/*","method":"POST/GET","description":"NextAuth routes"},
+    {"path":"/api/patients","method":"GET/POST","description":"Patients collection (CRUD missing)"},
+    {"path":"/api/appointments","method":"GET/POST","description":"Appointments (CRUD missing)"},
+    {"path":"/api/encounters","method":"GET/POST","description":"Encounters (CRUD missing)"},
+    {"path":"/api/documents","method":"POST/GET","description":"Document upload/download (Supabase not integrated)"}
+  ]
+}
