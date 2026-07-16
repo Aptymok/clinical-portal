@@ -4,6 +4,23 @@ import { parseJsonBody, validateSchema } from '@/lib/validation'
 import { AppointmentPatchSchema } from '@/schemas/appointment.schema'
 import { logAudit } from '@/lib/audit'
 
+export async function GET(_req: Request, { params }: { params: { id: string } }){
+  try{
+    const id = params.id
+    const item = await prisma.appointment.findUnique({
+      where: { id },
+      include: {
+        patient: { include: { person: true } },
+        provider: { include: { person: true } }
+      }
+    })
+    if (!item) return jsonErrorResponse({ message: 'Not found', code: 'NOT_FOUND', status: 404 })
+    return jsonSuccess(item)
+  }catch(e){
+    return jsonErrorResponse(e)
+  }
+}
+
 export async function PATCH(req: Request, { params }: { params: { id: string } }){
   try{
     const id = params.id

@@ -1,0 +1,466 @@
+# Portal de Seguimiento Clínico
+
+## Especificaciones del sistema
+
+1. Concepto central del sitio
+
+El sitio debe comunicar esto:
+
+El sitio del Dr. Jesús Guillermo Espinoza Contreras integra consulta médica especializada, seguimiento clínico y educación del paciente en un solo ecosistema digital.
+
+Su objetivo no es sustituir la consulta médica, sino acompañar al paciente antes, durante y después de la valoración: organizar antecedentes, registrar evolución, recordar tratamientos, facilitar revisiones médicas y permitir que el doctor observe la trayectoria clínica de cada caso con mayor claridad.
+
+La plataforma también permite construir, bajo consentimiento informado y anonimización de datos, una base de observación longitudinal que apoye futuras líneas de investigación clínica en alergología e inmunología.
+
+Ese texto puede ir en la página “Pacientes” o “Seguimiento clínico”.
+
+2. Módulos del ecosistema
+
+El sistema debería tener 6 módulos principales.
+
+Primero: perfil del paciente.
+Segundo: seguimiento clínico longitudinal.
+Tercero: agenda y revisiones médicas.
+Cuarto: recordatorios y comunicación asistida.
+Quinto: recetas, indicaciones y documentos médicos.
+Sexto: observatorio clínico anonimizado para investigación.
+
+La regla estructural: el paciente ve su propio acompañamiento; el doctor ve la evolución clínica; la IA solo ayuda a ordenar, resumir, recordar y sugerir preguntas o patrones. No diagnostica sola.
+
+3. Portal del paciente
+
+Cada paciente debe tener un panel privado con datos mínimos, siempre bajo aviso de privacidad y consentimiento.
+
+Campos recomendados:
+
+Datos generales
+- Nombre completo
+- Fecha de nacimiento
+- Edad
+- Sexo
+- Teléfono
+- Correo
+- Contacto de emergencia
+- Ciudad
+- Médico tratante
+
+Datos clínicos iniciales
+- Motivo principal de consulta
+- Síntomas actuales
+- Fecha de inicio
+- Frecuencia de síntomas
+- Severidad percibida
+- Diagnósticos previos
+- Medicamentos actuales
+- Alergias conocidas
+- Antecedentes personales
+- Antecedentes familiares relevantes
+- Enfermedades cardiovasculares, respiratorias, inmunológicas u otras relevantes
+- Estudios previos
+- Tratamientos anteriores
+- Respuesta a tratamientos anteriores
+
+Seguimiento
+- Síntomas por semana
+- Cambios desde la última consulta
+- Adherencia al tratamiento
+- Efectos secundarios
+- Crisis o eventos relevantes
+- Nuevos medicamentos
+- Notas del paciente
+- Archivos adjuntos
+
+El paciente no debe sentirse dentro de un expediente frío. Debe sentirse acompañado. El lenguaje de interfaz debe ser claro:
+
+¿Cómo te has sentido esta semana?
+¿Tuviste algún síntoma nuevo?
+¿Seguiste el tratamiento indicado?
+¿Tuviste alguna reacción o molestia?
+¿Quieres agendar revisión?
+4. Seguimiento por paciente
+
+La página del paciente debería mostrar una línea de tiempo:
+
+Primera consulta
+→ Diagnóstico inicial
+→ Tratamiento indicado
+→ Primer seguimiento
+→ Ajuste de tratamiento
+→ Evolución
+→ Revisión periódica
+→ Alta relativa / control / seguimiento extendido
+
+Cada evento debe registrar:
+
+Fecha
+Tipo de evento
+Síntomas reportados
+Observaciones del doctor
+Indicaciones
+Tratamiento activo
+Próxima revisión sugerida
+Alertas
+Archivos asociados
+
+Ejemplo de texto para el portal:
+
+Tu seguimiento permite observar cómo evoluciona tu caso con el tiempo. Aquí podrás registrar síntomas, cambios, dudas, medicamentos indicados y revisiones pendientes.
+
+Esta información ayuda al doctor a tener una visión más completa de tu proceso clínico. No sustituye una consulta médica ni debe usarse para urgencias. Si presentas síntomas graves o una reacción importante, acude a atención médica inmediata.
+
+5. Observabilidad longitudinal solo para el doctor
+
+Aquí está la parte más potente. El doctor debe tener un panel interno, no visible para pacientes, con métricas por caso y métricas agregadas.
+
+Por paciente:
+
+Trayectoria de síntomas
+Frecuencia de recaídas
+Adherencia al tratamiento
+Respuesta clínica
+Efectos adversos
+Tiempo entre consulta y mejoría
+Eventos críticos
+Tratamientos utilizados
+Cambios de diagnóstico
+Notas médicas
+Alertas de revisión
+
+Por población anonimizada:
+
+Patrones de recurrencia
+Síntomas más reportados
+Tratamientos con mejor seguimiento
+Temporadas con mayor incidencia
+Relación entre síntomas respiratorios/alérgicos/inmunológicos
+Casos con evolución atípica
+Necesidades educativas frecuentes
+Preguntas recurrentes de pacientes
+Posibles hipótesis de investigación
+
+Aquí la IA puede actuar como analista clínico auxiliar, no como autoridad médica.
+
+Ejemplos de salida interna:
+
+“En los últimos 90 días, los pacientes con síntomas respiratorios recurrentes reportaron mayor frecuencia de recaídas entre semana 3 y 5 posterior a la consulta inicial.”
+
+“Se detecta aumento de dudas relacionadas con suspensión temprana de tratamiento. Sugerencia: crear material educativo sobre adherencia terapéutica.”
+
+“Existen 12 casos anonimizados con recurrencia de síntomas pese a seguimiento. Sugerencia: revisar variables comunes para posible línea de investigación.”
+6. IA para investigación clínica anonimizada
+
+La idea es viable, pero solo con consentimiento y anonimización real. La información debe separarse así:
+
+Datos identificables
+- Nombre
+- Teléfono
+- Correo
+- Fecha de nacimiento
+- Expediente individual
+
+Datos clínicos pseudonimizados
+- ID interno
+- Edad por rango
+- Sexo si es necesario
+- Síntomas
+- evolución
+- tratamiento general
+- respuesta
+- fechas relativas
+
+Datos anonimizados para análisis
+- Sin nombre
+- Sin teléfono
+- Sin correo
+- Sin dirección
+- Sin identificadores directos
+- Agrupado por patrones
+
+Texto de consentimiento sugerido:
+
+Autorizo que mis datos clínicos puedan ser utilizados de forma anonimizada y agregada para fines de mejora de la atención médica, análisis estadístico, educación del paciente e investigación clínica.
+
+Esta información no incluirá mi nombre, teléfono, correo, dirección ni datos que permitan identificarme directamente. La participación es voluntaria y no afecta mi atención médica.
+
+Ese consentimiento debe revisarlo un abogado especializado en salud/datos personales antes de producción. No por formalismo: por riesgo real.
+
+7. Recetas digitales
+
+Aquí hay que ser preciso. En México, la receta médica digital puede operar si cumple requisitos formales, pero deben revisarse condiciones específicas, especialmente para medicamentos controlados. Fuentes especializadas de salud digital en México señalan que una receta debe incluir datos del médico, cédula, especialidad si aplica, datos del consultorio, datos del paciente, fecha, indicaciones y firma autógrafa o digital válida; para medicamentos controlados existen reglas específicas y trámites ante COFEPRIS.
+
+Mi recomendación operativa: incluir módulo de recetas solo en fase 2, no en la primera versión. Primero debe validarse:
+
+Requisitos de receta médica ordinaria
+Requisitos para firma digital
+Aceptación por farmacias locales
+Medicamentos permitidos
+Exclusión o manejo especial de controlados
+Resguardo de receta en expediente
+Trazabilidad de emisión
+Cancelación/corrección de receta
+
+En fase 1, el sistema puede emitir indicaciones médicas descargables o resumen de consulta, pero la receta digital formal debe tratarse como módulo regulado.
+
+8. Chatbot para pacientes
+
+El chatbot debe tener límites duros.
+
+Funciones correctas:
+
+Recordar medicamento según indicación del doctor
+Recordar próxima cita
+Explicar indicaciones ya emitidas por el doctor
+Ayudar a preparar la próxima consulta
+Preguntar por evolución general
+Detectar señales de alerta y recomendar contactar al consultorio o urgencias
+Enviar material educativo aprobado por el doctor
+
+Funciones prohibidas o de alto riesgo:
+
+Cambiar dosis
+Suspender medicamento
+Diagnosticar
+Prescribir
+Interpretar estudios como conclusión médica
+Resolver urgencias
+Dar indicaciones no autorizadas por el doctor
+
+Mensaje base del chatbot:
+
+Soy el asistente de seguimiento del consultorio. Puedo ayudarte a recordar indicaciones, registrar cómo te has sentido y preparar información para tu próxima consulta.
+
+No sustituyo al doctor, no emito diagnósticos y no modifico tratamientos. Si presentas dificultad para respirar, dolor intenso, reacción alérgica importante, desmayo, hinchazón progresiva o síntomas graves, busca atención médica inmediata.
+
+9. Alertas por medicamento
+
+Cada paciente podría configurar recordatorios únicos, pero deben depender de una indicación médica registrada.
+
+Campos:
+
+Medicamento
+Dosis
+Frecuencia
+Horario
+Duración
+Instrucciones especiales
+Fecha de inicio
+Fecha de término
+Recordatorio activo/inactivo
+Confirmación de toma
+Efectos secundarios reportados
+
+Alertas:
+
+“Es hora de tomar tu medicamento indicado.”
+“Hoy termina tu esquema. Confirma con el consultorio si tienes dudas.”
+“Recuerda registrar si tuviste algún síntoma nuevo.”
+“Tu revisión está próxima. ¿Deseas agendar?”
+
+No debe decir:
+
+“Sube la dosis”
+“Suspende el tratamiento”
+“Cambia medicamento”
+10. Agenda inteligente
+
+La agenda debe permitir tres tipos de revisión:
+
+Primera consulta
+Revisión de seguimiento
+Revisión por reactivación de síntomas
+
+El doctor puede definir reglas:
+
+Revisión a 7 días
+Revisión a 15 días
+Revisión a 30 días
+Revisión trimestral
+Revisión anual
+Seguimiento abierto según caso
+
+El sistema puede sugerir, no imponer:
+
+“Por tu última consulta, puede ser conveniente agendar revisión en 15 días.”
+“Reportaste recurrencia de síntomas. Considera solicitar una revisión.”
+“Tu tratamiento registrado termina pronto. Agenda seguimiento si el doctor lo indicó.”
+11. Contenido del sitio público
+
+Páginas recomendadas:
+
+Inicio
+Consulta de alergología
+Inmunología clínica
+Seguimiento del paciente
+Tecnología e IA en la consulta
+Trayectoria médica
+Investigación
+Preguntas frecuentes
+Agenda
+Aviso de privacidad
+Consentimiento para seguimiento digital
+
+Texto para la sección de seguimiento:
+
+El seguimiento médico permite observar la evolución del paciente más allá de una sola consulta. En el consultorio del Dr. Jesús Guillermo Espinoza Contreras, el acompañamiento puede incluir registro de síntomas, revisión de indicaciones, recordatorios de tratamiento y programación de consultas de seguimiento.
+
+El objetivo es que el paciente comprenda su diagnóstico, siga su tratamiento con mayor claridad y cuente con un canal ordenado para preparar sus revisiones médicas.
+
+Texto para IA aplicada:
+
+La inteligencia artificial se utiliza como herramienta de apoyo administrativo, educativo y de seguimiento. Ayuda a organizar información, generar recordatorios, preparar resúmenes para consulta y detectar patrones generales que puedan mejorar la atención.
+
+La IA no sustituye la valoración médica. Todo diagnóstico, tratamiento, ajuste terapéutico o decisión clínica corresponde exclusivamente al médico tratante.
+
+12. Panel del doctor
+
+Vista interna:
+
+Dashboard general
+- Pacientes activos
+- Pacientes en seguimiento
+- Pacientes sin revisión reciente
+- Alertas clínicas
+- Tratamientos por vencer
+- Mensajes pendientes
+- Citas próximas
+- Casos con síntomas persistentes
+
+Ficha de paciente
+- Datos generales
+- Línea de tiempo
+- Diagnósticos
+- Tratamientos
+- Notas médicas
+- Archivos
+- Recetas/indicaciones
+- Seguimientos
+- Alertas
+- Resumen IA para consulta
+
+Investigación
+- Dataset anonimizado
+- Tendencias
+- Cohortes
+- Hipótesis sugeridas
+- Exportación ética
+- Reportes agregados
+13. Modelo de datos mínimo
+Patient
+- id
+- name
+- birthdate
+- sex
+- phone
+- email
+- emergency_contact
+- consent_followup
+- consent_anonymized_research
+- created_at
+
+ClinicalProfile
+- patient_id
+- main_reason
+- symptoms
+- prior_diagnoses
+- current_medications
+- known_allergies
+- medical_history
+- family_history
+
+Visit
+- id
+- patient_id
+- date
+- type
+- doctor_notes
+- diagnosis
+- plan
+- followup_required
+- next_followup_date
+
+Treatment
+- id
+- patient_id
+- medication
+- dose
+- frequency
+- duration
+- instructions
+- start_date
+- end_date
+- active
+
+Reminder
+- id
+- patient_id
+- treatment_id
+- channel
+- time
+- message
+- active
+
+SymptomLog
+- id
+- patient_id
+- date
+- symptoms
+- severity
+- notes
+- adverse_effects
+
+ResearchEvent
+- id
+- anonymized_patient_id
+- age_range
+- symptom_group
+- treatment_group
+- outcome
+- date_relative
+14. Seguridad mínima
+
+No se debe improvisar con datos médicos. Mínimos:
+
+Login seguro
+Autenticación multifactor para doctor
+Roles: doctor, asistente, paciente
+Cifrado en tránsito HTTPS
+Cifrado en base de datos
+Backups
+Auditoría de accesos
+Bitácora de cambios
+Consentimientos versionados
+Aviso de privacidad integral
+Exportación y eliminación conforme derechos ARCO
+No enviar datos sensibles completos por WhatsApp
+No exponer expedientes por enlaces públicos
+
+La NOM-004 habla de confidencialidad e integración del expediente clínico, y la NOM-024 regula funcionalidades e interoperabilidad para sistemas electrónicos de registro en salud; por eso esta parte no puede tratarse como un CRM común.
+
+15. Sin comprometer al Doctor
+
+La idea de “ecosistema gratuito para pacientes que ofrecen datos” debe redactarse con cuidado. No debe sonar a intercambio de atención por datos. Mejor:
+
+“El seguimiento digital es un servicio de apoyo para pacientes del consultorio. De forma opcional, el paciente puede autorizar que su información se utilice de manera anonimizada y agregada para mejorar la atención médica y apoyar investigación clínica.”
+
+Eso separa atención médica de explotación de datos. La atención no debe depender de aceptar investigación.
+
+16. Roadmap recomendado
+
+Fase 1: sitio público + agenda + Google + contenido médico + reseñas.
+Fase 2: portal paciente + seguimiento + recordatorios + chatbot limitado.
+Fase 3: panel del doctor + línea de tiempo clínica + resúmenes IA.
+Fase 4: recetas/indicaciones digitales, previa validación legal y aceptación operativa.
+Fase 5: observatorio anonimizado + investigación + reportes agregados.
+Fase 6: publicaciones, dashboards académicos, material educativo y expansión institucional.
+
+17. Síntesis
+
+Convertir la consulta del doctor en un sistema continuo de observación, educación, seguimiento y generación de conocimiento. Pero debe operar con límites claros.
+
+Paciente: registra evolución, recibe recordatorios, agenda revisiones y entiende indicaciones.
+Doctor: observa trayectorias, ajusta seguimiento, detecta patrones y documenta mejor.
+IA: resume, ordena, alerta y sugiere hipótesis; no diagnostica ni prescribe.
+Investigación: solo con datos anonimizados, consentimiento y separación estricta de identidad.
+Recetas digitales: posibles, pero deben validarse legalmente antes de producción.
+
+La arquitectura correcta no es “IA médica espectacular”. Es más fuerte: continuidad clínica verificable, humana, protegida y medible.

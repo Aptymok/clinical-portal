@@ -6,7 +6,13 @@ import { logAudit } from '@/lib/audit'
 
 export async function GET(){
   try{
-    const items = await prisma.appointment.findMany({ include: { patient: { include: { person: true } }, provider: true } })
+    const items = await prisma.appointment.findMany({
+      include: {
+        patient: { include: { person: true } },
+        provider: { include: { person: true } }
+      },
+      orderBy: { scheduledFor: 'asc' }
+    })
     return jsonSuccess(items)
   }catch(e){
     return jsonErrorResponse(e)

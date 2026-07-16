@@ -1,11 +1,18 @@
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import EncountersTable from '@/components/EncountersTable'
+import { prisma } from '@/lib/prisma'
+
+export const dynamic = 'force-dynamic'
 
 export default async function Encounters(){
-  const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL ?? ''}/api/encounters`, { cache: 'no-store' })
-  const body = await res.json()
-  const items = body?.success ? body.data : []
+  const items = await prisma.encounter.findMany({
+    include: {
+      patient: { include: { person: true } },
+      provider: { include: { person: true } }
+    },
+    orderBy: { startedAt: 'desc' }
+  })
 
   return (
     <>

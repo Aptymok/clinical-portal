@@ -51,6 +51,10 @@ a{color:var(--navy-700);text-decoration:none}
 /* Layout content */
 .page{padding:24px 0}
 .card{background:var(--white);padding:16px;border:1px solid #e6e6e6}
+.eyebrow{margin:0 0 4px;color:var(--navy-700);font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase}
+.stats-grid{display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:16px}
+.stat-card h3{margin:4px 0 0;font-size:28px;color:var(--navy-900)}
+.btn-ghost{display:inline-flex;align-items:center;background:transparent;border:1px solid var(--navy-700);color:var(--navy-700);padding:8px 12px}
 
 /* Tables */
 table{width:100%;border-collapse:collapse}

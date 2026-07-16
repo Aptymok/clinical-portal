@@ -1,7 +1,7 @@
 "use client"
 import React from 'react'
 
-type Encounter = { id: string, startedAt: string, patient: { person: { firstName: string, lastName: string } } }
+type Encounter = { id: string, startedAt: string | Date, patient: { person: { firstName: string, lastName: string } } }
 
 export default function EncountersTable({ items }: { items: Encounter[] }){
   return (

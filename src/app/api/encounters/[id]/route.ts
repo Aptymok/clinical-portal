@@ -7,7 +7,15 @@ import { logAudit } from '@/lib/audit'
 export async function GET(_req: Request, { params }: { params: { id: string } }){
   try{
     const id = params.id
-    const item = await prisma.encounter.findUnique({ where: { id }, include: { observations: true, diagnoses: true } })
+    const item = await prisma.encounter.findUnique({
+      where: { id },
+      include: {
+        patient: { include: { person: true } },
+        provider: { include: { person: true } },
+        observations: true,
+        diagnoses: true
+      }
+    })
     if (!item) return jsonErrorResponse({ message: 'Not found', code: 'NOT_FOUND', status: 404 })
     return jsonSuccess(item)
   }catch(e){

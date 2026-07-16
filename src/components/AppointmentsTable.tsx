@@ -1,7 +1,7 @@
 "use client"
 import React from 'react'
 
-type Appointment = { id: string, scheduledFor: string, patient: { person: { firstName: string, lastName: string } } }
+type Appointment = { id: string, scheduledFor: string | Date, patient: { person: { firstName: string, lastName: string } } }
 
 export default function AppointmentsTable({ items }: { items: Appointment[] }){
   return (
