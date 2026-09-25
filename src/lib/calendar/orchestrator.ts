@@ -160,7 +160,7 @@ export async function ingestCalendarEvent(
       }
     })
 
-    const targets = event.canonicalEcho
+    const targets = event.canonicalEcho || conflict
       ? []
       : await tx.calendarSource.findMany({
           where: {
