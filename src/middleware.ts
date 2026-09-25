@@ -3,7 +3,14 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 const DOCTORIAL_PREFIXES = ['/dashboard', '/patients', '/appointments', '/encounters', '/documents']
-const CLINICAL_API_PREFIXES = ['/api/dashboard', '/api/patients', '/api/appointments', '/api/encounters', '/api/documents']
+const CLINICAL_API_PREFIXES = [
+  '/api/dashboard',
+  '/api/patients',
+  '/api/appointments',
+  '/api/encounters',
+  '/api/documents',
+  '/api/calendar/alerts'
+]
 
 export async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname
@@ -46,6 +53,7 @@ export const config = {
     '/api/patients/:path*',
     '/api/appointments/:path*',
     '/api/encounters/:path*',
-    '/api/documents/:path*'
+    '/api/documents/:path*',
+    '/api/calendar/alerts/:path*'
   ]
 }
