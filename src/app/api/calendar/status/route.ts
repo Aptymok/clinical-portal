@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { sourceConfig, type DocplannerSourceConfig, type GoogleSourceConfig, type GenericWebhookSourceConfig } from '@/lib/calendar/source-config'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   const sources = await prisma.calendarSource.findMany({
     orderBy: { id: 'asc' },
