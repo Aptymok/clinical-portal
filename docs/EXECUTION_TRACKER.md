@@ -30,7 +30,23 @@ Deliver a first defensible clinical continuity slice:
 | Search Console submission | BLOCKED | no ownership/API authority observed | verified property authority |
 | Ranking/visibility RETURN | NOT_OBSERVED | no baseline captured yet | deploy, index, then measure |
 
-## Verified RETURN — calendar master first instance
+## Verified RETURN — connector-ready calendar fabric
+
+Final connector head verified: `cd936b6fc250d54cfd2aadebfe459415e7b5f1b2`
+
+- Prisma schema validation: SUCCESS
+- TypeScript typecheck: SUCCESS
+- Vitest: SUCCESS (including encryption + Docplanner callback behavior)
+- Next.js production build: SUCCESS
+- Vercel: SUCCESS
+- Google connector code: IMPLEMENTED, external OAuth credentials NOT_OBSERVED
+- Docplanner connector code: IMPLEMENTED, external integration credentials NOT_OBSERVED
+- Third-calendar generic connector: IMPLEMENTED, actual provider NOT_IDENTIFIED
+- Production DB migration: NOT_OBSERVED
+
+This is now CONNECTOR_READY, not yet EXTERNALLY_CONNECTED.
+
+## Previous verified RETURN — calendar master first instance
 
 Head validated: `d3aff46ec516c204dd78b412a4c568a238113532`
 
