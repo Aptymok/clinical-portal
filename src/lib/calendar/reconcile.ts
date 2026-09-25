@@ -36,7 +36,7 @@ export function reconcileCalendarEvents(
   const events: CanonicalCalendarEvent[] = []
   const conflicts: CalendarConflict[] = []
 
-  for (const [canonicalKey, group] of correlated.entries()) {
+  for (const [canonicalKey, group] of Array.from(correlated.entries())) {
     const baseline = group
       .slice()
       .sort((a, b) => (b.sourceUpdatedAt ?? '').localeCompare(a.sourceUpdatedAt ?? ''))[0]
