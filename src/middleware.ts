@@ -9,7 +9,12 @@ const CLINICAL_API_PREFIXES = [
   '/api/appointments',
   '/api/encounters',
   '/api/documents',
-  '/api/calendar/alerts'
+  '/api/calendar/alerts',
+  '/api/calendar/bootstrap',
+  '/api/calendar/status',
+  '/api/calendar/google/connect',
+  '/api/calendar/google/callback',
+  '/api/calendar/docplanner/connect'
 ]
 
 export async function middleware(req: NextRequest) {
@@ -54,6 +59,11 @@ export const config = {
     '/api/appointments/:path*',
     '/api/encounters/:path*',
     '/api/documents/:path*',
-    '/api/calendar/alerts/:path*'
+    '/api/calendar/alerts/:path*',
+    '/api/calendar/bootstrap/:path*',
+    '/api/calendar/status/:path*',
+    '/api/calendar/google/connect/:path*',
+    '/api/calendar/google/callback/:path*',
+    '/api/calendar/docplanner/connect/:path*'
   ]
 }
