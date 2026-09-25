@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { sourceConfig, type GoogleSourceConfig } from '@/lib/calendar/source-config'
 import { syncGoogleSource } from '@/lib/calendar/google'
+import { processPropagationJobs } from '@/lib/calendar/propagation'
 
 export const runtime = 'nodejs'
 
@@ -22,6 +23,7 @@ export async function POST(request: Request) {
 
   try {
     await syncGoogleSource(sourceId)
+    await processPropagationJobs({ limit: 50 })
     return new Response(null, { status: 204 })
   } catch (error) {
     console.error('Google calendar webhook sync failed', error)
