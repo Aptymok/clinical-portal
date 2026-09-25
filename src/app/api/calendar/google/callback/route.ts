@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { verifyCalendarOAuthState } from '@/lib/calendar/oauth-state'
 import { completeGoogleOAuth } from '@/lib/calendar/google'
+import { processPropagationJobs } from '@/lib/calendar/propagation'
 
 export async function GET(request: Request) {
   const url = new URL(request.url)
@@ -15,6 +16,7 @@ export async function GET(request: Request) {
   try {
     const verified = verifyCalendarOAuthState(state)
     await completeGoogleOAuth(verified.sourceId, code)
+    await processPropagationJobs({ limit: 50 })
     return NextResponse.redirect(`${site}/dashboard?calendar=google-connected`)
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Google connection failed'
