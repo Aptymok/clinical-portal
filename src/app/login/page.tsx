@@ -2,11 +2,13 @@
 
 import { FormEvent, useState } from 'react'
 import { signIn } from 'next-auth/react'
-import { useSearchParams } from 'next/navigation'
+
+function callbackFromLocation() {
+  if (typeof window === 'undefined') return '/dashboard'
+  return new URLSearchParams(window.location.search).get('callbackUrl') || '/dashboard'
+}
 
 export default function LoginPage() {
-  const params = useSearchParams()
-  const callbackUrl = params.get('callbackUrl') || '/dashboard'
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
@@ -18,6 +20,7 @@ export default function LoginPage() {
     const form = new FormData(event.currentTarget)
     const email = String(form.get('email') || '')
     const password = String(form.get('password') || '')
+    const callbackUrl = callbackFromLocation()
 
     const result = await signIn('credentials', {
       email,
