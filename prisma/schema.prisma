@@ -449,3 +449,172 @@ model ClinicSettings {
 
   @@map("clinic_settings")
 }
+
+
+enum CalendarCanonicalStatus {
+  BUSY
+  CANCELLED
+  TENTATIVE
+}
+
+enum CalendarSyncState {
+  RECEIVED
+  RECONCILED
+  PROPAGATION_PENDING
+  COMPLETED
+  CONFLICT
+  FAILED
+}
+
+enum CalendarPropagationState {
+  PENDING
+  SENT
+  CONFIRMED
+  FAILED
+  SKIPPED
+}
+
+model CalendarSource {
+  id                   String   @id
+  name                 String
+  providerType         String
+  enabled              Boolean  @default(true)
+  readAuthority        Boolean  @default(false)
+  writeAuthority       Boolean  @default(false)
+  realtimeBookingCheck Boolean  @default(false)
+  webhookEnabled       Boolean  @default(false)
+  externalRef          String?
+  config               Json?
+  lastSyncAt           DateTime?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  externalEvents  CalendarExternalEvent[]
+  syncEvents      CalendarSyncEvent[]
+  propagationJobs CalendarPropagationJob[] @relation("CalendarPropagationTarget")
+  secret          CalendarConnectionSecret?
+
+  @@index([providerType])
+  @@index([enabled])
+}
+
+model CanonicalCalendarEvent {
+  id              String                  @id @default(cuid())
+  canonicalKey    String                  @unique
+  providerRef     String
+  startsAt        DateTime
+  endsAt          DateTime
+  timezone        String
+  status          CalendarCanonicalStatus @default(BUSY)
+  version         Int                     @default(1)
+  sourceOfTruthId String?
+  conflict        Boolean                 @default(false)
+  conflictMeta    Json?
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+
+  externalEvents  CalendarExternalEvent[]
+  syncEvents      CalendarSyncEvent[]
+  propagationJobs CalendarPropagationJob[]
+  alerts          CalendarAlert[]
+
+  @@index([providerRef, startsAt, endsAt])
+  @@index([status])
+  @@index([conflict])
+}
+
+model CalendarExternalEvent {
+  id              String   @id @default(cuid())
+  sourceId        String
+  externalEventId String
+  canonicalEventId String?
+  correlationKey  String?
+  providerRef     String
+  startsAt        DateTime
+  endsAt          DateTime
+  timezone        String
+  status          String
+  sourceUpdatedAt DateTime?
+  lastObservedAt  DateTime @default(now())
+  payloadHash     String?
+  rawMeta         Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  source         CalendarSource          @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  canonicalEvent CanonicalCalendarEvent? @relation(fields: [canonicalEventId], references: [id], onDelete: SetNull)
+
+  @@unique([sourceId, externalEventId])
+  @@index([canonicalEventId])
+  @@index([providerRef, startsAt, endsAt])
+}
+
+model CalendarSyncEvent {
+  id               String            @id @default(cuid())
+  dedupeKey        String            @unique
+  sourceId         String?
+  externalEventId  String?
+  eventType        String
+  payload          Json
+  state            CalendarSyncState @default(RECEIVED)
+  canonicalEventId String?
+  error            String?
+  receivedAt       DateTime          @default(now())
+  processedAt      DateTime?
+
+  source         CalendarSource?         @relation(fields: [sourceId], references: [id], onDelete: SetNull)
+  canonicalEvent CanonicalCalendarEvent? @relation(fields: [canonicalEventId], references: [id], onDelete: SetNull)
+  propagationJobs CalendarPropagationJob[]
+
+  @@index([state, receivedAt])
+  @@index([canonicalEventId])
+}
+
+model CalendarPropagationJob {
+  id               String                   @id @default(cuid())
+  syncEventId      String
+  canonicalEventId String
+  targetSourceId   String
+  action           String
+  state            CalendarPropagationState @default(PENDING)
+  attempts         Int                      @default(0)
+  lastAttemptAt    DateTime?
+  externalReturn   Json?
+  error            String?
+  createdAt        DateTime                 @default(now())
+  updatedAt        DateTime                 @updatedAt
+
+  syncEvent      CalendarSyncEvent       @relation(fields: [syncEventId], references: [id], onDelete: Cascade)
+  canonicalEvent CanonicalCalendarEvent  @relation(fields: [canonicalEventId], references: [id], onDelete: Cascade)
+  targetSource   CalendarSource          @relation("CalendarPropagationTarget", fields: [targetSourceId], references: [id], onDelete: Cascade)
+
+  @@unique([syncEventId, targetSourceId, action])
+  @@index([state, createdAt])
+}
+
+model CalendarAlert {
+  id               String   @id @default(cuid())
+  canonicalEventId String?
+  type             String
+  severity         String   @default("WARNING")
+  message          String
+  status           String   @default("OPEN")
+  meta             Json?
+  createdAt        DateTime @default(now())
+  resolvedAt       DateTime?
+
+  canonicalEvent CanonicalCalendarEvent? @relation(fields: [canonicalEventId], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+}
+
+
+model CalendarConnectionSecret {
+  id               String   @id @default(cuid())
+  sourceId         String   @unique
+  encryptedPayload String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  source CalendarSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+}
