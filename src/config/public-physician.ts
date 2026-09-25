@@ -2,6 +2,7 @@ export const publicPhysician = {
   slug: 'dr-jesus-guillermo-espinoza-contreras',
   name: 'Dr. Jesús Guillermo Espinoza Contreras',
   clinicName: 'Inmunoclinic',
+  locationName: 'Star Médica Aguascalientes',
   specialties: ['Alergología', 'Inmunología clínica', 'Medicina interna'],
   focus: 'Inmunología clínica y alergia',
   description:
@@ -41,6 +42,26 @@ export const publicPhysician = {
     addressCountry: 'MX',
   },
   telephone: '+52 449 996 6500',
+  clinicOperations: {
+    availability: 'Toda la semana',
+    purposes: [
+      'Recolección de medicamento',
+      'Vacunas',
+      'Agenda de citas',
+    ],
+  },
+  physicianConsultationSchedule: {
+    exact: [
+      { day: 'Tuesday', label: 'Martes', opens: '11:00', closes: '14:00' },
+      { day: 'Tuesday', label: 'Martes', opens: '16:00', closes: '19:00' },
+      { day: 'Thursday', label: 'Jueves', opens: '11:00', closes: '14:00' },
+      { day: 'Thursday', label: 'Jueves', opens: '16:00', closes: '19:00' },
+    ],
+    saturday: {
+      label: 'Sábado',
+      description: 'Consulta al mediodía; confirmar hora exacta al agendar.',
+    },
+  },
   externalProfiles: [
     'https://www.doctoralia.com.mx/perfil/jesus-guillermo-espinoza-contreras',
     'https://undoctorparati.com/alergologos-en-aguascalientes/dr-jesus-guillermo-espinoza-contreras/',

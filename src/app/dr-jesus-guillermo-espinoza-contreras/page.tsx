@@ -46,6 +46,12 @@ export default function PhysicianPage() {
       '@type': 'City',
       name: 'Aguascalientes',
     },
+    openingHoursSpecification: publicPhysician.physicianConsultationSchedule.exact.map((slot) => ({
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: `https://schema.org/${slot.day}`,
+      opens: slot.opens,
+      closes: slot.closes,
+    })),
   }
 
   return (
@@ -97,12 +103,26 @@ export default function PhysicianPage() {
 
       <section className="card" style={{ marginTop: 16 }}>
         <h2>Consultorio</h2>
-        <p>{publicPhysician.clinicName}</p>
+        <p>{publicPhysician.clinicName} · {publicPhysician.locationName}</p>
         <p>
           {publicPhysician.address.streetAddress}, {publicPhysician.address.addressLocality},{' '}
           {publicPhysician.address.addressRegion}, C.P. {publicPhysician.address.postalCode}.
         </p>
         <p>Teléfono: {publicPhysician.telephone}</p>
+        <p>
+          Operación del consultorio: {publicPhysician.clinicOperations.availability} para{' '}
+          {publicPhysician.clinicOperations.purposes.join(', ')}.
+        </p>
+      </section>
+
+      <section className="card" style={{ marginTop: 16 }}>
+        <h2>Horario de consulta del Dr. Guillermo</h2>
+        <p>Martes: 11:00–14:00 y 16:00–19:00.</p>
+        <p>Jueves: 11:00–14:00 y 16:00–19:00.</p>
+        <p>{publicPhysician.physicianConsultationSchedule.saturday.description}</p>
+        <p>
+          El horario de operación del consultorio no equivale al horario de consulta del médico.
+        </p>
       </section>
 
       <section className="card" style={{ marginTop: 16 }}>
