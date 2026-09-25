@@ -94,7 +94,7 @@ export async function ingestCalendarEvent(
         endsAt,
         timezone: event.timezone,
         status: incomingStatus,
-        sourceOfTruthId: event.sourceId,
+        sourceOfTruthId: event.canonicalEcho ? undefined : event.sourceId,
         conflict,
         conflictMeta
       },
@@ -160,14 +160,16 @@ export async function ingestCalendarEvent(
       }
     })
 
-    const targets = await tx.calendarSource.findMany({
-      where: {
-        enabled: true,
-        writeAuthority: true,
-        id: { not: event.sourceId }
-      },
-      select: { id: true }
-    })
+    const targets = event.canonicalEcho
+      ? []
+      : await tx.calendarSource.findMany({
+          where: {
+            enabled: true,
+            writeAuthority: true,
+            id: { not: event.sourceId }
+          },
+          select: { id: true }
+        })
 
     const action = incomingStatus === CalendarCanonicalStatus.CANCELLED
       ? 'CANCEL_OR_FREE'
