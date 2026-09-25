@@ -1,10 +1,9 @@
 import { randomBytes, randomUUID } from 'node:crypto'
-import type { CalendarSource } from '@prisma/client'
+import type { CalendarSource, CanonicalCalendarEvent } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { readCalendarSecret, writeCalendarSecret } from '@/lib/calendar/secrets'
 import { patchCalendarSourceConfig, sourceConfig, type GoogleSourceConfig } from '@/lib/calendar/source-config'
 import { ingestCalendarEvent } from '@/lib/calendar/orchestrator'
-import { processPropagationJobs } from '@/lib/calendar/propagation'
 
 type GoogleTokenSet = {
   accessToken: string
@@ -153,9 +152,7 @@ export async function syncGoogleSource(sourceId: string, reset = false) {
         sourceUpdatedAt: event.updated || null
       }, `google:${sourceId}:${event.id}:${event.updated || event.status || 'unknown'}`)
 
-      if (result.propagationQueued) {
-        await processPropagationJobs({ syncEventId: result.syncEvent.id })
-      }
+      void result
       ingested += 1
     }
 
@@ -260,4 +257,130 @@ export async function completeGoogleOAuth(sourceId: string, code: string) {
 
   await syncGoogleSource(sourceId)
   return startGoogleWatch(sourceId)
+}
+
+
+function googleCalendarId(source: CalendarSource) {
+  const config = sourceConfig<GoogleSourceConfig>(source.config)
+  return source.externalRef || config.calendarId || 'primary'
+}
+
+function googleManagedEventBody(event: CanonicalCalendarEvent) {
+  return {
+    summary: 'Horario no disponible',
+    description: 'Bloque sincronizado por Clinical Portal. No contiene información clínica del paciente.',
+    start: { dateTime: event.startsAt.toISOString(), timeZone: event.timezone },
+    end: { dateTime: event.endsAt.toISOString(), timeZone: event.timezone },
+    transparency: 'opaque',
+    extendedProperties: {
+      private: {
+        clinicalPortalCanonicalKey: event.canonicalKey,
+        clinicalPortalManaged: 'true'
+      }
+    }
+  }
+}
+
+async function persistGoogleMapping(
+  source: CalendarSource,
+  event: CanonicalCalendarEvent,
+  externalEventId: string,
+  status: string
+) {
+  const existing = await prisma.calendarExternalEvent.findFirst({
+    where: { sourceId: source.id, canonicalEventId: event.id }
+  })
+
+  if (existing) {
+    return prisma.calendarExternalEvent.update({
+      where: { id: existing.id },
+      data: {
+        externalEventId,
+        correlationKey: event.canonicalKey,
+        providerRef: event.providerRef,
+        startsAt: event.startsAt,
+        endsAt: event.endsAt,
+        timezone: event.timezone,
+        status,
+        lastObservedAt: new Date(),
+        rawMeta: { managedBy: 'clinical-portal', kind: 'google-event' }
+      }
+    })
+  }
+
+  return prisma.calendarExternalEvent.create({
+    data: {
+      sourceId: source.id,
+      externalEventId,
+      canonicalEventId: event.id,
+      correlationKey: event.canonicalKey,
+      providerRef: event.providerRef,
+      startsAt: event.startsAt,
+      endsAt: event.endsAt,
+      timezone: event.timezone,
+      status,
+      rawMeta: { managedBy: 'clinical-portal', kind: 'google-event' }
+    }
+  })
+}
+
+export async function upsertGoogleBusy(source: CalendarSource, event: CanonicalCalendarEvent) {
+  const calendarId = googleCalendarId(source)
+  const existing = await prisma.calendarExternalEvent.findFirst({
+    where: { sourceId: source.id, canonicalEventId: event.id }
+  })
+
+  let response: Response
+  if (existing) {
+    response = await googleFetch(
+      source.id,
+      `/calendars/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(existing.externalEventId)}`,
+      { method: 'PATCH', body: JSON.stringify(googleManagedEventBody(event)) }
+    )
+    if (response.status === 404) {
+      response = await googleFetch(
+        source.id,
+        `/calendars/${encodeURIComponent(calendarId)}/events`,
+        { method: 'POST', body: JSON.stringify(googleManagedEventBody(event)) }
+      )
+    }
+  } else {
+    response = await googleFetch(
+      source.id,
+      `/calendars/${encodeURIComponent(calendarId)}/events`,
+      { method: 'POST', body: JSON.stringify(googleManagedEventBody(event)) }
+    )
+  }
+
+  if (!response.ok) throw new Error(`Google event writeback failed: ${response.status}`)
+  const body = await response.json() as GoogleEvent
+  if (!body.id) throw new Error('Google event writeback did not return an event ID')
+
+  await persistGoogleMapping(source, event, body.id, 'SCHEDULED')
+  return { externalEventId: body.id, observedState: { id: body.id, status: body.status || 'confirmed' } }
+}
+
+export async function cancelGoogleBusy(source: CalendarSource, event: CanonicalCalendarEvent) {
+  const existing = await prisma.calendarExternalEvent.findFirst({
+    where: { sourceId: source.id, canonicalEventId: event.id }
+  })
+  if (!existing) return { observedState: { skipped: 'no-managed-event' } }
+
+  const calendarId = googleCalendarId(source)
+  const response = await googleFetch(
+    source.id,
+    `/calendars/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(existing.externalEventId)}`,
+    { method: 'DELETE' }
+  )
+
+  if (!response.ok && response.status !== 404 && response.status !== 410) {
+    throw new Error(`Google event removal failed: ${response.status}`)
+  }
+
+  await prisma.calendarExternalEvent.update({
+    where: { id: existing.id },
+    data: { status: 'CANCELLED', lastObservedAt: new Date() }
+  })
+
+  return { externalEventId: existing.externalEventId, observedState: { status: response.status } }
 }
