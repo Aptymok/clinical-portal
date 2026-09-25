@@ -30,6 +30,21 @@ Deliver a first defensible clinical continuity slice:
 | Search Console submission | BLOCKED | no ownership/API authority observed | verified property authority |
 | Ranking/visibility RETURN | NOT_OBSERVED | no baseline captured yet | deploy, index, then measure |
 
+## Verified RETURN — calendar master first instance
+
+Head validated: `d3aff46ec516c204dd78b412a4c568a238113532`
+
+- Prisma schema validation: SUCCESS
+- TypeScript typecheck: SUCCESS
+- Vitest suite: SUCCESS
+- Next.js build: SUCCESS
+- Vercel deployment status: SUCCESS
+- Production database migration: NOT_OBSERVED
+- Real Doctoralia/Google/source-C credentials: NOT_OBSERVED
+- External writeback cycle: NOT_OBSERVED
+
+This means the first implementation is technically buildable and deployable, but external calendar synchronization is not yet operational until real provider authority and database migration are applied.
+
 ## Observed RETURN history
 
 ### Vercel preview attempt 1
