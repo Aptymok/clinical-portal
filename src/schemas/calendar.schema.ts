@@ -4,6 +4,7 @@ export const CalendarIntakeSchema = z.object({
   sourceId: z.string().min(1),
   externalEventId: z.string().min(1),
   correlationKey: z.string().min(1).nullable().optional(),
+  canonicalEcho: z.boolean().optional(),
   providerRef: z.string().min(1),
   startsAt: z.string().refine((value) => !Number.isNaN(Date.parse(value)), 'Invalid startsAt'),
   endsAt: z.string().refine((value) => !Number.isNaN(Date.parse(value)), 'Invalid endsAt'),
