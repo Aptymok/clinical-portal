@@ -13,6 +13,7 @@ export type NormalizedCalendarEvent = {
   sourceId: string
   externalEventId: string
   correlationKey?: string | null
+  canonicalEcho?: boolean
   providerRef: string
   startsAt: string
   endsAt: string
