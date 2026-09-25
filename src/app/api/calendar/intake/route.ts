@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto'
+import { NextResponse } from 'next/server'
 import { CalendarIntakeSchema } from '@/schemas/calendar.schema'
 import { hasValidCalendarSyncSecret } from '@/lib/calendar/integration-auth'
 import { ingestCalendarEvent } from '@/lib/calendar/orchestrator'
@@ -11,12 +12,12 @@ function dedupeKeyFor(body: unknown) {
 
 export async function POST(request: Request) {
   if (!hasValidCalendarSyncSecret(request)) {
-    return Response.json({ error: 'UNAUTHORIZED' }, { status: 401 })
+    return NextResponse.json({ error: 'UNAUTHORIZED' }, { status: 401 })
   }
 
   const parsed = CalendarIntakeSchema.safeParse(await request.json().catch(() => null))
   if (!parsed.success) {
-    return Response.json({ error: 'INVALID_EVENT', details: parsed.error.flatten() }, { status: 400 })
+    return NextResponse.json({ error: 'INVALID_EVENT', details: parsed.error.flatten() }, { status: 400 })
   }
 
   const requestedKey = request.headers.get('idempotency-key')?.trim()
@@ -25,7 +26,7 @@ export async function POST(request: Request) {
   try {
     const result = await ingestCalendarEvent(parsed.data, dedupeKey)
 
-    return Response.json({
+    return NextResponse.json({
       accepted: true,
       duplicate: result.duplicate,
       canonicalEventId: result.canonicalEvent?.id,
@@ -36,6 +37,6 @@ export async function POST(request: Request) {
     })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Calendar intake failed'
-    return Response.json({ error: 'CALENDAR_INTAKE_FAILED', message }, { status: 409 })
+    return NextResponse.json({ error: 'CALENDAR_INTAKE_FAILED', message }, { status: 409 })
   }
 }
