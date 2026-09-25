@@ -33,6 +33,7 @@ export default async function Dashboard(){
       <Header />
       <div className="container page">
         <h2>Dashboard clínico</h2>
+        <p><a href="/dashboard/calendar-integrations">Administrar integraciones de calendario →</a></p>
         <div className="stats-grid">
           <div className="card stat-card">
             <p className="eyebrow">Pacientes</p>
