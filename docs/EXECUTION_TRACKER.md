@@ -30,6 +30,17 @@ Deliver a first defensible clinical continuity slice:
 | Search Console submission | BLOCKED | no ownership/API authority observed | verified property authority |
 | Ranking/visibility RETURN | NOT_OBSERVED | no baseline captured yet | deploy, index, then measure |
 
+## Observed RETURN history
+
+### Vercel preview attempt 1
+- Head: `66d821f2caed1d54a47bfd59004df3fa684dfb16`
+- RETURN: FAILURE
+- Direct build log was not observable through the available Vercel connection because the `clinical-portal` project was not exposed by that connector.
+- A concrete Next.js build-risk was identified in the login page: `useSearchParams()` at page level can require a Suspense boundary during static generation.
+- Reversible correction applied: removed the page-level `useSearchParams()` dependency and resolved callback URL at submit time.
+- Corrective commit: `097bf4815e03968d9407cf355202e1a73217e712`
+- New deployment RETURN: pending/not yet observed at tracker update time.
+
 ## Rules for closure
 A task may move to DONE only when:
 - code/config exists where required;
@@ -39,8 +50,8 @@ A task may move to DONE only when:
 - ranking/indexing claims are based on observations, not requested actions.
 
 ## Next execution order
-1. Obtain CI/Vercel RETURN for this branch.
-2. Fix any build/type/test failures.
+1. Observe the deployment RETURN for corrective head `097bf4815e03968d9407cf355202e1a73217e712`.
+2. If it fails, isolate the next concrete build error and correct it.
 3. Identify the three calendar providers and connection method.
 4. Add read-only adapters first.
 5. Run one real reconciliation cycle and inspect conflicts.
