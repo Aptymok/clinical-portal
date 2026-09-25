@@ -7,6 +7,7 @@ import { logAudit } from "./lib/audit";
 export const authOptions = {
   trustHost: true,
   adapter: PrismaAdapter(prisma),
+  session: { strategy: 'jwt' as const },
   providers: [
     CredentialsProvider({
       name: 'Credentials',
