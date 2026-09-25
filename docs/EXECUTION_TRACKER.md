@@ -1,0 +1,49 @@
+# Execution Tracker — Calendar + Physician Discovery
+
+Updated: 2026-09-24
+Branch: `delivery/calendar-discovery-governance`
+
+## Goal
+Deliver a first defensible clinical continuity slice:
+1. secure private authority plane;
+2. governed canonical calendar capable of reconciling three sources;
+3. public crawlable physician identity plane;
+4. external actions only when authority and RETURN are observable.
+
+## Current state
+
+| Workstream | State | Evidence | Remaining gate |
+|---|---|---|---|
+| Password verification | IMPLEMENTED_ON_BRANCH | scrypt hash/verify + credentials provider | build/deploy check + real authorized account |
+| Clinical route protection | IMPLEMENTED_ON_BRANCH | middleware protects pages/APIs by staff role | deployment verification |
+| Functional login UI | IMPLEMENTED_ON_BRANCH | credentials form + callback | deployment verification |
+| Canonical calendar contract | IMPLEMENTED_ON_BRANCH | source/canonical types | persistence adapter |
+| Reconciliation engine | IMPLEMENTED_ON_BRANCH | provenance + contradictions + collision logic | test execution + three real source adapters |
+| Calendar provider A | BLOCKED | no provider/credentials supplied | identify source + authorize |
+| Calendar provider B | BLOCKED | no provider/credentials supplied | identify source + authorize |
+| Calendar provider C | BLOCKED | no provider/credentials supplied | identify source + authorize |
+| Physician public identity | IMPLEMENTED_ON_BRANCH | public route + canonical metadata | deploy + enrich only with verified public data |
+| Structured data | IMPLEMENTED_ON_BRANCH | Physician JSON-LD | production URL + external validation |
+| Sitemap | IMPLEMENTED_ON_BRANCH | sitemap.ts | production URL |
+| Robots governance | IMPLEMENTED_ON_BRANCH | private routes disallowed | deployment verification |
+| Google Business reconciliation | BLOCKED | no authorized GBP connection observed | account/API authority |
+| Search Console submission | BLOCKED | no ownership/API authority observed | verified property authority |
+| Ranking/visibility RETURN | NOT_OBSERVED | no baseline captured yet | deploy, index, then measure |
+
+## Rules for closure
+A task may move to DONE only when:
+- code/config exists where required;
+- build/test/deployment RETURN is observed;
+- external integrations have verified authority;
+- external state is re-read after writes;
+- ranking/indexing claims are based on observations, not requested actions.
+
+## Next execution order
+1. Obtain CI/Vercel RETURN for this branch.
+2. Fix any build/type/test failures.
+3. Identify the three calendar providers and connection method.
+4. Add read-only adapters first.
+5. Run one real reconciliation cycle and inspect conflicts.
+6. Add persistence for source links and canonical reconciliation state.
+7. Connect authorized Google Business/Search Console surfaces.
+8. Capture discovery baseline and subsequent observations.
