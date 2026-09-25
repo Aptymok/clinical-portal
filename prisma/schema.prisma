@@ -492,6 +492,7 @@ model CalendarSource {
   externalEvents  CalendarExternalEvent[]
   syncEvents      CalendarSyncEvent[]
   propagationJobs CalendarPropagationJob[] @relation("CalendarPropagationTarget")
+  secret          CalendarConnectionSecret?
 
   @@index([providerType])
   @@index([enabled])
@@ -605,4 +606,15 @@ model CalendarAlert {
   canonicalEvent CanonicalCalendarEvent? @relation(fields: [canonicalEventId], references: [id], onDelete: SetNull)
 
   @@index([status, createdAt])
+}
+
+
+model CalendarConnectionSecret {
+  id               String   @id @default(cuid())
+  sourceId         String   @unique
+  encryptedPayload String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  source CalendarSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
 }
