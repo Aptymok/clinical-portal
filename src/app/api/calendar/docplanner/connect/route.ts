@@ -10,7 +10,7 @@ export async function POST() {
     await docplannerAccessToken(source)
     const updated = await prisma.calendarSource.update({
       where: { id: source.id },
-      data: { readAuthority: true, writeAuthority: false, enabled: true, webhookEnabled: Boolean(process.env.DOCPLANNER_WEBHOOK_SECRET), realtimeBookingCheck: false }
+      data: { readAuthority: true, writeAuthority: false, enabled: true, webhookEnabled: false, realtimeBookingCheck: false }
     })
     return NextResponse.json({
       connected: true,
