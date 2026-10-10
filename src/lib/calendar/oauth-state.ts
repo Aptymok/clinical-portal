@@ -27,7 +27,7 @@ export function verifyCalendarOAuthState(value: string): OAuthState {
   if (a.length !== b.length || !timingSafeEqual(a, b)) throw new Error('Invalid OAuth state signature')
 
   const parsed = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')) as OAuthState
-  if (!parsed.sourceId || Date.now() - parsed.issuedAt > 15 * 60 * 1000) {
+  if (!parsed.sourceId || !Number.isFinite(parsed.issuedAt) || parsed.issuedAt > Date.now() || Date.now() - parsed.issuedAt > 15 * 60 * 1000) {
     throw new Error('Expired OAuth state')
   }
   return parsed
