@@ -18,7 +18,9 @@ export function signCalendarOAuthState(state: OAuthState) {
 }
 
 export function verifyCalendarOAuthState(value: string): OAuthState {
-  const [payload, supplied] = value.split('.')
+  const parts = value.split('.')
+  if (parts.length !== 2) throw new Error('Invalid OAuth state format')
+  const [payload, supplied] = parts
   if (!payload || !supplied) throw new Error('Invalid OAuth state')
 
   const expected = createHmac('sha256', secret()).update(payload).digest('base64url')
