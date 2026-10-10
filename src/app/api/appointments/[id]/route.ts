@@ -57,9 +57,11 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
 export async function DELETE(_req: Request, { params }: { params: { id: string } }){
   try{
     const id = params.id
-    await prisma.appointment.delete({ where: { id } })
-    await logAudit({ action: 'DELETE', resource: 'Appointment', resourceId: id })
-    return jsonSuccess({ ok: true })
+    const current = await prisma.appointment.findUnique({ where: { id } })
+    if (!current) return NextResponse.json({ error: 'NOT_FOUND' }, { status: 404 })
+    const updated = await prisma.appointment.update({ where: { id }, data: { status: 'CANCELLED' } })
+    await logAudit({ action: 'CANCEL', resource: 'Appointment', resourceId: id })
+    return jsonSuccess({ ok: true, status: updated.status, externalPropagation: 'NOT_VERIFIED' })
   }catch(e){
     return jsonErrorResponse(e)
   }
