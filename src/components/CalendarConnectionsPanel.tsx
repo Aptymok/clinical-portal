@@ -11,6 +11,8 @@ type Health = {
     readAuthority: boolean
     writeAuthority: boolean
     lastSyncAt?: string | null
+    realtimeBookingCheck: boolean
+    webhookEnabled: boolean
     connection: Record<string, unknown>
   }>
   pendingPropagationJobs: number
@@ -21,10 +23,13 @@ type Health = {
 export default function CalendarConnectionsPanel() {
   const [health, setHealth] = useState<Health | null>(null)
   const [message, setMessage] = useState('')
+  const [alerts, setAlerts] = useState<Array<{id:string;type:string;severity:string;message:string;createdAt:string}>>([])
 
   async function refresh() {
     const response = await fetch('/api/calendar/status', { cache: 'no-store' })
     if (response.ok) setHealth(await response.json())
+    const alertResponse = await fetch('/api/calendar/alerts', { cache: 'no-store' })
+    if (alertResponse.ok) { const result = await alertResponse.json(); setAlerts(result.items || []) }
   }
 
   useEffect(() => { void refresh() }, [])
@@ -66,10 +71,12 @@ export default function CalendarConnectionsPanel() {
           <div key={source.id} style={{ borderTop: '1px solid #e6e6e6', padding: '12px 0' }}>
             <strong>{source.name}</strong>
             <div>Lectura: {source.readAuthority ? 'autorizada' : 'pendiente'} · Escritura: {source.writeAuthority ? 'autorizada' : 'pendiente'}</div>
-            <div>Última sincronización: {source.lastSyncAt || 'sin observar'}</div>
+            <div>Última sincronización: {source.lastSyncAt ? new Date(source.lastSyncAt).toLocaleString('es-MX',{timeZone:'America/Mexico_City'}) : 'sin observar'}</div>
+            <div>Notificaciones: {source.webhookEnabled ? 'habilitadas' : 'sin verificar'} · Bloqueo de doble reserva en tiempo real: {source.realtimeBookingCheck ? 'habilitado' : 'sin verificar'}</div>
           </div>
         ))}
       </div>
+      <section className="card" aria-label="Alertas de calendario"><h2>Alertas de sincronización</h2>{alerts.length ? <ul>{alerts.map(a => <li key={a.id}><strong>{a.severity} · {a.type}</strong> — {a.message}</li>)}</ul> : <p>Sin alertas abiertas registradas. Esto no confirma que las fuentes estén sincronizadas.</p>}</section>
     </div>
   )
 }
