@@ -45,7 +45,7 @@ export default async function Dashboard() {
  <p><Link href="/dashboard/calendar-integrations">Revisar cobertura de fuentes y alertas →</Link></p>
  </section>
  <section className="card" style={{marginTop:20}}><h2>Herramientas clínicas</h2><div style={{display:'flex',flexWrap:'wrap',gap:16}}>
- <Link href="/appointments">Administrar citas →</Link><Link href="/patients">Pacientes →</Link><Link href="/dashboard/calendar-integrations">Calendarios conectados →</Link><Link href="/encounters">Consultas →</Link>
+ <Link href="/dashboard/calendar">Abrir agenda maestra →</Link><Link href="/appointments">Administrar citas →</Link><Link href="/patients">Pacientes →</Link><Link href="/dashboard/calendar-integrations">Calendarios conectados →</Link><Link href="/encounters">Consultas →</Link>
  </div></section>
  <p style={{marginTop:20}}>Para comprobar el estado de sincronización, consulta <Link href="/dashboard/calendar-integrations">Integraciones de calendario</Link>. Una agenda vacía en el portal no confirma disponibilidad externa.</p>
  </main><Footer/></>
