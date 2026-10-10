@@ -11,12 +11,17 @@ export default async function Dashboard() {
  const todayStart = new Date(mexicoDate+'T00:00:00-06:00')
  const tomorrow = new Date(todayStart.getTime()+24*60*60*1000)
  const nextWeek = new Date(now); nextWeek.setDate(nextWeek.getDate()+7)
- const [todayAppointments, upcoming, pendingCount, patientsCount] = await Promise.all([
+ const [todayAppointments, upcoming, pendingCount, patientsCount, canonicalToday, canonicalUpcoming, calendarSources, openCalendarAlerts] = await Promise.all([
   prisma.appointment.findMany({where:{scheduledFor:{gte:todayStart,lt:tomorrow},status:'SCHEDULED'},include:{patient:{include:{person:true}}},orderBy:{scheduledFor:'asc'}}),
   prisma.appointment.findMany({where:{scheduledFor:{gte:now,lte:nextWeek},status:'SCHEDULED'},include:{patient:{include:{person:true}}},orderBy:{scheduledFor:'asc'},take:12}),
   prisma.appointment.count({where:{status:'SCHEDULED',scheduledFor:{gte:now}}}),
-  prisma.patient.count()
+  prisma.patient.count(),
+  prisma.canonicalCalendarEvent.findMany({where:{startsAt:{gte:todayStart,lt:tomorrow},status:{not:'CANCELLED'}},orderBy:{startsAt:'asc'},take:40}),
+  prisma.canonicalCalendarEvent.findMany({where:{startsAt:{gte:now,lte:nextWeek},status:{not:'CANCELLED'}},orderBy:{startsAt:'asc'},take:80}),
+  prisma.calendarSource.findMany({where:{enabled:true},select:{id:true,name:true,readAuthority:true,lastSyncAt:true,providerType:true,webhookEnabled:true}}),
+  prisma.calendarAlert.count({where:{status:'OPEN'}})
  ])
+ const coverageReady=calendarSources.length>0&&calendarSources.every(s=>s.readAuthority&&s.lastSyncAt&&(s.providerType!=='GOOGLE_CALENDAR'||s.webhookEnabled))
  const time=(date:Date)=>new Intl.DateTimeFormat('es-MX',{timeZone:'America/Mexico_City',weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}).format(date)
  return <><Header/><main className="container page">
  <p className="eyebrow">INMUNOCLINIC · ÁREA PROFESIONAL</p>
@@ -32,6 +37,12 @@ export default async function Dashboard() {
  </section>
  <section className="card" style={{marginTop:20}}><h2>Próximos siete días</h2>
  {upcoming.length?<ul>{upcoming.map(a=><li key={a.id}>{time(a.scheduledFor)} · {a.patient.person.firstName} {a.patient.person.lastName}</li>)}</ul>:<p>No hay próximas citas registradas en el portal.</p>}
+ </section>
+ <section className="card" style={{marginTop:20}}><h2>Calendario maestro · eventos consolidados</h2>
+ <p>{coverageReady?'Fuentes registradas con lectura y observación inicial.':'Cobertura incompleta: no interpretar espacios vacíos como disponibilidad.'} · {calendarSources.length} fuentes habilitadas · {openCalendarAlerts} alertas abiertas.</p>
+ <p><strong>Eventos ocupados hoy:</strong> {canonicalToday.length} · <strong>Próximos siete días:</strong> {canonicalUpcoming.length}</p>
+ {canonicalUpcoming.length?<ul>{canonicalUpcoming.map(e=><li key={e.id}>{time(e.startsAt)} · {e.status==='TENTATIVE'?'Tentativo':'Ocupado'}{e.conflict?' · CONFLICTO':''} · Referencia {e.canonicalKey}</li>)}</ul>:<p>Sin eventos consolidados observados. Consulta también cada calendario de origen.</p>}
+ <p><Link href="/dashboard/calendar-integrations">Revisar cobertura de fuentes y alertas →</Link></p>
  </section>
  <section className="card" style={{marginTop:20}}><h2>Herramientas clínicas</h2><div style={{display:'flex',flexWrap:'wrap',gap:16}}>
  <Link href="/appointments">Administrar citas →</Link><Link href="/patients">Pacientes →</Link><Link href="/dashboard/calendar-integrations">Calendarios conectados →</Link><Link href="/encounters">Consultas →</Link>
