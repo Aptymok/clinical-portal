@@ -272,3 +272,11 @@
   .public-profile-body{padding:48px 0 64px}
   .public-profile-row{grid-template-columns:1fr;gap:4px}
 }
+
+/* Public navigation: accessible on compact screens */
+.public-mobile-menu{display:none;position:relative;color:var(--public-navy)}
+.public-mobile-menu summary{cursor:pointer;font-weight:700;list-style:revert}
+.public-mobile-menu nav{position:absolute;right:0;top:calc(100% + 12px);z-index:90;min-width:245px;background:white;border:1px solid var(--public-line);box-shadow:0 20px 40px rgba(11,44,93,.13);padding:14px;display:grid;gap:12px}
+.public-mobile-menu nav a{color:var(--public-navy);font-size:14px}
+@media(max-width:1050px){.public-mobile-menu{display:block;margin-left:auto}.public-header-inner{gap:12px}.public-header-actions{border:0;padding-left:0}}
+@media(max-width:640px){.public-brand-link{flex:0 1 170px}.public-brand-logo{max-width:170px;height:65px}.public-header-actions{display:none}.public-shell{width:min(100% - 28px,1180px)}}
