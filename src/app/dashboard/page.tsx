@@ -7,8 +7,9 @@ export const dynamic = 'force-dynamic'
 
 export default async function Dashboard() {
  const now = new Date()
- const todayStart = new Date(now); todayStart.setHours(0,0,0,0)
- const tomorrow = new Date(todayStart); tomorrow.setDate(tomorrow.getDate()+1)
+ const mexicoDate = new Intl.DateTimeFormat('en-CA',{timeZone:'America/Mexico_City',year:'numeric',month:'2-digit',day:'2-digit'}).format(now)
+ const todayStart = new Date(mexicoDate+'T00:00:00-06:00')
+ const tomorrow = new Date(todayStart.getTime()+24*60*60*1000)
  const nextWeek = new Date(now); nextWeek.setDate(nextWeek.getDate()+7)
  const [todayAppointments, upcoming, pendingCount, patientsCount] = await Promise.all([
   prisma.appointment.findMany({where:{scheduledFor:{gte:todayStart,lt:tomorrow},status:'SCHEDULED'},include:{patient:{include:{person:true}}},orderBy:{scheduledFor:'asc'}}),
@@ -35,6 +36,6 @@ export default async function Dashboard() {
  <section className="card" style={{marginTop:20}}><h2>Herramientas clínicas</h2><div style={{display:'flex',flexWrap:'wrap',gap:16}}>
  <Link href="/appointments">Administrar citas →</Link><Link href="/patients">Pacientes →</Link><Link href="/dashboard/calendar-integrations">Calendarios conectados →</Link><Link href="/encounters">Consultas →</Link>
  </div></section>
- <p style={{marginTop:20}}>Sincronización externa: pendiente de verificación. No se presentan citas externas como consolidadas.</p>
+ <p style={{marginTop:20}}>Para comprobar el estado de sincronización, consulta <Link href="/dashboard/calendar-integrations">Integraciones de calendario</Link>. Una agenda vacía en el portal no confirma disponibilidad externa.</p>
  </main><Footer/></>
 }
