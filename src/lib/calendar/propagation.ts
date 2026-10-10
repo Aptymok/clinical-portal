@@ -23,6 +23,11 @@ export async function processPropagationJobs(input: { syncEventId?: string; limi
   const results: Array<{ jobId: string; state: string; error?: string }> = []
 
   for (const job of jobs) {
+    if (!job.targetSource.enabled || !job.targetSource.writeAuthority) {
+      await prisma.calendarPropagationJob.update({ where: { id: job.id }, data: { state: CalendarPropagationState.SKIPPED, externalReturn: { reason: 'target-not-authorized' } } })
+      results.push({ jobId: job.id, state: 'SKIPPED' })
+      continue
+    }
     await prisma.calendarPropagationJob.update({
       where: { id: job.id },
       data: {
