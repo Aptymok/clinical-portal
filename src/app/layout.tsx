@@ -9,6 +9,7 @@ export const metadata: Metadata = {
     template: '%s | Inmunoclinic',
   },
   description: 'Alergología, inmunología clínica y medicina interna en Aguascalientes.',
+  openGraph: { type: 'website', locale: 'es_MX', siteName: 'Inmunoclinic', title: 'Inmunoclinic | Dr. Jesús Guillermo Espinoza Contreras', description: 'Alergología, inmunología clínica y medicina interna en Aguascalientes.' },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
