@@ -20,10 +20,13 @@ export async function POST(request: Request) {
 
   const payload = await request.json().catch(() => null)
   const sourceId = new URL(request.url).searchParams.get('sourceId') || 'doctoralia'
+  const source = await prisma.calendarSource.findUnique({ where: { id: sourceId } })
+  if (!source || source.providerType !== 'DOCPLANNER' || !source.enabled || !source.readAuthority) return new Response(null, { status: 403 })
   const normalized = normalizeDocplannerNotification(sourceId, payload)
 
   if (normalized.kind === 'availability') {
     const result = await checkCanonicalAvailability(normalized)
+    if (!source.realtimeBookingCheck) return NextResponse.json({ available: false, reason: 'REALTIME_CHECK_NOT_VERIFIED' }, { status: 503 })
     return result.available
       ? new Response(null, { status: 204 })
       : NextResponse.json({ available: false, reason: 'SLOT_ALREADY_OCCUPIED' }, { status: 409 })
