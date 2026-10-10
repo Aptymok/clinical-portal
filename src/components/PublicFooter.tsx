@@ -15,7 +15,7 @@ export default function PublicFooter() {
         <div>
           <strong>Contacto</strong>
           <p><a href="tel:+524499966500">449 996 6500</a></p>
-          <p><Link href="/login">Portal clínico</Link></p>
+          <p><Link href="/login">Portal clínico</Link></p><nav className="public-footer-links" aria-label="Información legal"><Link href="/aviso-de-privacidad">Aviso de privacidad</Link><Link href="/derechos-del-paciente">Derechos del paciente</Link><Link href="/terminos-de-uso">Términos de uso</Link></nav>
         </div>
       </div>
       <div className="public-shell public-footer-bottom">
