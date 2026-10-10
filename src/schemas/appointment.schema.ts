@@ -10,7 +10,7 @@ export const AppointmentCreateSchema = z.object({
 
 export const AppointmentPatchSchema = z.object({
   scheduledFor: z.string().optional().refine((s) => !s || !Number.isNaN(Date.parse(s)), { message: 'Invalid date' }),
-  status: z.string().optional(),
+  status: z.enum(['SCHEDULED','CANCELLED','COMPLETED','NO_SHOW']).optional(),
   reason: z.string().optional(),
   notes: z.string().optional()
 })
