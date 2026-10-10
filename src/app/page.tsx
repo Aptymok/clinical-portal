@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import PublicHeader from '@/components/PublicHeader'
 import PublicFooter from '@/components/PublicFooter'
-import { publicPhysician } from '@/config/public-physician'
+import { publicPhysician, canonicalSiteUrl } from '@/config/public-physician'
 
 type IconName = 'pin' | 'school' | 'medical' | 'clock' | 'shield' | 'lungs' | 'drop' | 'file' | 'people'
 
@@ -27,8 +27,14 @@ const serviceItems = [
 ]
 
 export default function Page() {
+  const base = canonicalSiteUrl()
+  const structuredData = {'@context':'https://schema.org','@graph':[
+    {'@type':'MedicalClinic','@id':base+'/#clinic',name:'Inmunoclinic',url:base,telephone:publicPhysician.telephone,address:{'@type':'PostalAddress',...publicPhysician.address}},
+    {'@type':'Physician','@id':base+'/#physician',name:publicPhysician.name,url:base+'/'+publicPhysician.slug,telephone:publicPhysician.telephone,worksFor:{'@id':base+'/#clinic'}}
+  ]}
   return (
     <div className="public-site">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(structuredData)}} />
       <PublicHeader />
 
       <main>
