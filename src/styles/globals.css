@@ -60,3 +60,44 @@ a{color:var(--navy-700);text-decoration:none}
 table{width:100%;border-collapse:collapse}
 th,td{padding:8px;border:1px solid #e6e6e6;text-align:left}
 th{background:#f5f5f5;font-weight:700}
+
+/* Inmunoclinic professional master calendar */
+.master-calendar{max-width:1320px}
+.master-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;margin-bottom:20px}
+.master-heading h1{font-size:clamp(2rem,4vw,3.1rem);letter-spacing:-.045em;color:#351427;margin:8px 0}
+.master-heading p{max-width:760px;line-height:1.6}
+.master-heading .btn{display:inline-flex;align-items:center;border-radius:12px;white-space:nowrap;background:#702c48;padding:13px 18px}
+.master-readiness{padding:20px 24px;border:1px solid #dec5cc;border-radius:16px;margin-bottom:20px}
+.master-readiness strong{font-size:1.15rem;color:#52213a}
+.master-readiness p{margin:8px 0 0;line-height:1.6}
+.master-readiness-warning{background:#fff5f2;border-color:#dfab9a}
+.master-readiness-ready{background:#f2f8f7;border-color:#b2d4c8}
+.master-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:22px}
+.master-stats>div{display:flex;flex-direction:column;gap:8px;padding:20px 22px;border:1px solid #e9e0e5;background:#fff;border-radius:16px}
+.master-stats span{font-size:.86rem;color:#6d6070}
+.master-stats strong{font-size:2rem;color:#4b1f36;line-height:1}
+.master-columns{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(270px,.85fr);gap:22px;align-items:start}
+.master-main,.master-side{min-width:0}
+.master-main>h2{font-size:1.45rem;color:#351427}
+.master-day{margin-top:22px}
+.master-day h3{font-size:1rem;text-transform:capitalize;color:#60405a;margin-bottom:12px}
+.master-events{display:flex;flex-direction:column;gap:10px}
+.master-event{display:grid;grid-template-columns:110px minmax(0,1fr) auto;align-items:center;gap:16px;border:1px solid #e9e0e5;background:#fff;border-radius:14px;padding:16px}
+.master-event time{color:#6c2f4c;font-size:.85rem;font-weight:700}
+.master-event div{display:flex;flex-direction:column;gap:5px;min-width:0}
+.master-event strong{color:#352133}
+.master-event span,.master-event small{overflow-wrap:anywhere}
+.master-event span{font-size:.83rem;color:#5b5462}
+.master-event small{font-size:.75rem;color:#777079}
+.master-event a{white-space:nowrap}
+.master-conflict{border-color:#cd7d66;background:#fff5f2}
+.master-side{display:flex;flex-direction:column;gap:16px}
+.master-side .card{border-radius:16px;padding:20px;border-color:#e9e0e5}
+.master-side h2{margin-top:0;color:#351427}
+.master-source{display:flex;flex-direction:column;gap:5px;padding:12px 0;border-bottom:1px solid #ece7eb}
+.master-source strong{color:#3c2c38}
+.master-source span,.master-source small{font-size:.83rem}
+.master-side li{margin-bottom:12px;overflow-wrap:anywhere}
+.master-side li p{font-size:.83rem;margin:6px 0}
+@media(max-width:960px){.master-columns{grid-template-columns:1fr}.master-stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){.master-heading{flex-direction:column}.master-stats{grid-template-columns:repeat(2,1fr)}.master-stats>div{padding:16px}.master-event{grid-template-columns:1fr;gap:8px}.master-event a{justify-self:start}.master-calendar{padding:16px}}
