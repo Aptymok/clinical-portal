@@ -10,10 +10,12 @@ export async function POST() {
     await docplannerAccessToken(source)
     const updated = await prisma.calendarSource.update({
       where: { id: source.id },
-      data: { readAuthority: true, writeAuthority: true, enabled: true, webhookEnabled: true }
+      data: { readAuthority: true, writeAuthority: false, enabled: true, webhookEnabled: Boolean(process.env.DOCPLANNER_WEBHOOK_SECRET), realtimeBookingCheck: false }
     })
     return NextResponse.json({
       connected: true,
+      writeAuthority: updated.writeAuthority,
+      note: 'OAuth confirmado. Escritura y disponibilidad en tiempo real requieren verificacion independiente.',
       sourceId: updated.id,
       domain: (updated.config as any)?.domain || process.env.DOCPLANNER_DOMAIN || 'doctoralia.mx'
     })
