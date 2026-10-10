@@ -66,8 +66,8 @@ export default function Page() {
               </p>
 
               <div className="public-actions">
-                <a href="#contacto" className="public-cta">Agendar cita <span>→</span></a>
-                <a href="#servicios" className="public-secondary-cta">Conocer servicios <span>→</span></a>
+                <a href="/ubicacion-y-contacto" className="public-cta">Agendar cita <span>→</span></a>
+                <a href="/servicios-y-vacunas" className="public-secondary-cta">Conocer servicios <span>→</span></a>
               </div>
             </div>
 
@@ -84,7 +84,7 @@ export default function Page() {
               </div>
               <div className="public-schedule-contact">
                 <span className="public-phone-number">449 996 6500</span>
-                <a href="#contacto">Agendar cita →</a>
+                <a href="/ubicacion-y-contacto">Agendar cita →</a>
               </div>
             </aside>
           </div>
