@@ -23,7 +23,6 @@ const serviceItems = [
   { icon: 'drop' as IconName, title: 'Pruebas de alergia', text: 'Pruebas cutáneas y evaluación dirigida según la historia clínica.' },
   { icon: 'shield' as IconName, title: 'Inmunología clínica', text: 'Evaluación de inmunodeficiencias, autoinmunidad y alteraciones del sistema inmune.' },
   { icon: 'medical' as IconName, title: 'Medicina interna', text: 'Integración clínica de la persona adulta y sus condiciones concomitantes.' },
-  { icon: 'file' as IconName, title: 'Seguimiento', text: 'Continuidad del tratamiento, revisión de respuesta y ajustes clínicos documentados.' },
 ]
 
 export default function Page() {
@@ -67,7 +66,7 @@ export default function Page() {
               <div className="public-accent-rule" />
               <h2 className="public-human-title">Atención integral y humana</h2>
               <p className="public-lead">
-                Con enfoque en personas adultas y adultas mayores. La valoración integra alergología,
+                Con enfoque en niños, personas adultas y adultas mayores. La valoración integra alergología,
                 inmunología clínica y medicina interna para mantener continuidad, claridad y contexto clínico.
               </p>
 
@@ -101,7 +100,7 @@ export default function Page() {
             <div><span>01</span><strong>Precisión</strong><small>Diagnóstico fundamentado</small></div>
             <div><span>02</span><strong>Confianza</strong><small>Información clara y verificable</small></div>
             <div><span>03</span><strong>Orden clínico</strong><small>Seguimiento y continuidad</small></div>
-            <div><span>04</span><strong>Atención adulta</strong><small>Adultos y adultos mayores</small></div>
+            <div><span>04</span><strong>Atención integral</strong><small>Niños y adultos</small></div>
           </div>
         </section>
 
