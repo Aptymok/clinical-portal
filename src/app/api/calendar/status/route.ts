@@ -62,7 +62,7 @@ export async function GET() {
     openAlerts: alerts,
     endpoints: {
       googleRedirectUri: `${(process.env.NEXT_PUBLIC_SITE_URL || '').replace(/\/$/, '')}/api/calendar/google/callback`,
-      docplannerWebhookPath: '/api/calendar/docplanner/webhook?sourceId=doctoralia&token=<DOCPLANNER_WEBHOOK_SECRET>',
+      docplannerWebhookPath: '/api/calendar/docplanner/webhook',
       genericIntakePath: '/api/calendar/intake',
       availabilityGatePath: '/api/calendar/availability',
       maintenancePath: '/api/calendar/maintenance'

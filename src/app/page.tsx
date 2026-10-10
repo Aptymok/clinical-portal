@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import PublicHeader from '@/components/PublicHeader'
 import PublicFooter from '@/components/PublicFooter'
-import { publicPhysician } from '@/config/public-physician'
+import { publicPhysician, canonicalSiteUrl } from '@/config/public-physician'
 
 type IconName = 'pin' | 'school' | 'medical' | 'clock' | 'shield' | 'lungs' | 'drop' | 'file' | 'people'
 
@@ -23,12 +23,17 @@ const serviceItems = [
   { icon: 'drop' as IconName, title: 'Pruebas de alergia', text: 'Pruebas cutáneas y evaluación dirigida según la historia clínica.' },
   { icon: 'shield' as IconName, title: 'Inmunología clínica', text: 'Evaluación de inmunodeficiencias, autoinmunidad y alteraciones del sistema inmune.' },
   { icon: 'medical' as IconName, title: 'Medicina interna', text: 'Integración clínica de la persona adulta y sus condiciones concomitantes.' },
-  { icon: 'file' as IconName, title: 'Seguimiento', text: 'Continuidad del tratamiento, revisión de respuesta y ajustes clínicos documentados.' },
 ]
 
 export default function Page() {
+  const base = canonicalSiteUrl()
+  const structuredData = {'@context':'https://schema.org','@graph':[
+    {'@type':'MedicalClinic','@id':base+'/#clinic',name:'Inmunoclinic',url:base,telephone:publicPhysician.telephone,address:{'@type':'PostalAddress',...publicPhysician.address}},
+    {'@type':'Physician','@id':base+'/#physician',name:publicPhysician.name,url:base+'/'+publicPhysician.slug,telephone:publicPhysician.telephone,worksFor:{'@id':base+'/#clinic'}}
+  ]}
   return (
     <div className="public-site">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(structuredData)}} />
       <PublicHeader />
 
       <main>
@@ -61,13 +66,13 @@ export default function Page() {
               <div className="public-accent-rule" />
               <h2 className="public-human-title">Atención integral y humana</h2>
               <p className="public-lead">
-                Con enfoque en personas adultas y adultas mayores. La valoración integra alergología,
+                Con enfoque en niños, personas adultas y adultas mayores. La valoración integra alergología,
                 inmunología clínica y medicina interna para mantener continuidad, claridad y contexto clínico.
               </p>
 
               <div className="public-actions">
-                <a href="#contacto" className="public-cta">Agendar cita <span>→</span></a>
-                <a href="#servicios" className="public-secondary-cta">Conocer servicios <span>→</span></a>
+                <a href="/ubicacion-y-contacto" className="public-cta">Agendar cita <span>→</span></a>
+                <a href="/servicios-y-vacunas" className="public-secondary-cta">Conocer servicios <span>→</span></a>
               </div>
             </div>
 
@@ -84,7 +89,7 @@ export default function Page() {
               </div>
               <div className="public-schedule-contact">
                 <span className="public-phone-number">449 996 6500</span>
-                <a href="#contacto">Agendar cita →</a>
+                <a href="/ubicacion-y-contacto">Agendar cita →</a>
               </div>
             </aside>
           </div>
@@ -95,7 +100,7 @@ export default function Page() {
             <div><span>01</span><strong>Precisión</strong><small>Diagnóstico fundamentado</small></div>
             <div><span>02</span><strong>Confianza</strong><small>Información clara y verificable</small></div>
             <div><span>03</span><strong>Orden clínico</strong><small>Seguimiento y continuidad</small></div>
-            <div><span>04</span><strong>Atención adulta</strong><small>Adultos y adultos mayores</small></div>
+            <div><span>04</span><strong>Atención integral</strong><small>Niños y adultos</small></div>
           </div>
         </section>
 

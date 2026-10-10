@@ -20,9 +20,16 @@ export async function POST(request: Request) {
 
   const payload = await request.json().catch(() => null)
   const sourceId = new URL(request.url).searchParams.get('sourceId') || 'doctoralia'
+  const source = await prisma.calendarSource.findUnique({ where: { id: sourceId } })
+  if (!source || source.providerType !== 'DOCPLANNER' || !source.enabled || !source.readAuthority) return new Response(null, { status: 403 })
   const normalized = normalizeDocplannerNotification(sourceId, payload)
 
   if (normalized.kind === 'availability') {
+    if (!source.realtimeBookingCheck) return NextResponse.json({ available: false, reason: 'REALTIME_CHECK_NOT_VERIFIED' }, { status: 503 })
+    const coverage = await prisma.calendarSource.findMany({ where: { enabled: true }, select: { id: true, readAuthority: true, lastSyncAt: true, webhookEnabled: true, providerType: true } })
+    if (coverage.length === 0 || coverage.some((item) => !item.readAuthority || !item.lastSyncAt || (item.providerType === 'GOOGLE_CALENDAR' && !item.webhookEnabled))) {
+      return NextResponse.json({ available: false, reason: 'CALENDAR_COVERAGE_UNVERIFIED' }, { status: 503 })
+    }
     const result = await checkCanonicalAvailability(normalized)
     return result.available
       ? new Response(null, { status: 204 })

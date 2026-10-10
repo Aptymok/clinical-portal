@@ -8,7 +8,7 @@ export async function GET(request: Request) {
   const code = url.searchParams.get('code')
   const state = url.searchParams.get('state')
   const error = url.searchParams.get('error')
-  const site = (process.env.NEXT_PUBLIC_SITE_URL || '').replace(/\/$/, '')
+  const site = (process.env.NEXT_PUBLIC_SITE_URL || new URL(request.url).origin).replace(/\/$/, '')
 
   if (error) return NextResponse.redirect(`${site}/dashboard?calendar=google-denied`)
   if (!code || !state) return NextResponse.json({ error: 'INVALID_GOOGLE_CALLBACK' }, { status: 400 })

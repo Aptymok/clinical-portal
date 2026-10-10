@@ -11,7 +11,7 @@ export async function POST(request: Request) {
   if (!sourceId) return new Response(null, { status: 404 })
 
   const source = await prisma.calendarSource.findUnique({ where: { id: sourceId } })
-  if (!source || source.providerType !== 'GOOGLE_CALENDAR') return new Response(null, { status: 404 })
+  if (!source || !source.enabled || !source.readAuthority || source.providerType !== 'GOOGLE_CALENDAR') return new Response(null, { status: 404 })
 
   const config = sourceConfig<GoogleSourceConfig>(source.config)
   const channelId = request.headers.get('x-goog-channel-id')

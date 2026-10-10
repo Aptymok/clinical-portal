@@ -2,10 +2,10 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
 export async function POST() {
-  const doctorId = process.env.DOCTORPLANNER_DOCTOR_ID || ''
-  const facilityId = process.env.DOCTORPLANNER_FACILITY_ID || ''
-  const addressId = process.env.DOCTORPLANNER_ADDRESS_ID || ''
-  const domain = process.env.DOCTORPLANNER_DOMAIN || 'doctoralia.mx'
+  const doctorId = process.env.DOCPLANNER_DOCTOR_ID || ''
+  const facilityId = process.env.DOCPLANNER_FACILITY_ID || ''
+  const addressId = process.env.DOCPLANNER_ADDRESS_ID || ''
+  const domain = process.env.DOCPLANNER_DOMAIN || 'doctoralia.mx'
   const googleCalendarId = process.env.GOOGLE_CALENDAR_ID || 'primary'
 
   const sources = await Promise.all([
@@ -16,10 +16,10 @@ export async function POST() {
         name: 'Doctoralia / Docplanner',
         providerType: 'DOCPLANNER',
         enabled: true,
-        readAuthority: Boolean(doctorId && facilityId && addressId),
-        writeAuthority: Boolean(doctorId && facilityId && addressId),
-        realtimeBookingCheck: true,
-        webhookEnabled: true,
+        readAuthority: false,
+        writeAuthority: false,
+        realtimeBookingCheck: false,
+        webhookEnabled: false,
         externalRef: doctorId || null,
         config: { domain, doctorId, facilityId, addressId }
       },
@@ -40,7 +40,7 @@ export async function POST() {
         readAuthority: false,
         writeAuthority: false,
         realtimeBookingCheck: false,
-        webhookEnabled: true,
+        webhookEnabled: false,
         externalRef: googleCalendarId,
         config: { calendarId: googleCalendarId }
       },
@@ -57,10 +57,10 @@ export async function POST() {
         name: 'Third Calendar',
         providerType: 'GENERIC_WEBHOOK',
         enabled: true,
-        readAuthority: Boolean(process.env.THIRD_CALENDAR_WRITE_URL),
-        writeAuthority: Boolean(process.env.THIRD_CALENDAR_WRITE_URL),
-        realtimeBookingCheck: true,
-        webhookEnabled: true,
+        readAuthority: false,
+        writeAuthority: false,
+        realtimeBookingCheck: false,
+        webhookEnabled: false,
         config: { writeUrl: process.env.THIRD_CALENDAR_WRITE_URL || null }
       },
       update: {
