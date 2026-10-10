@@ -23,8 +23,8 @@ export async function processPropagationJobs(input: { syncEventId?: string; limi
   const results: Array<{ jobId: string; state: string; error?: string }> = []
 
   for (const job of jobs) {
-    if (!job.targetSource.enabled || !job.targetSource.writeAuthority) {
-      await prisma.calendarPropagationJob.update({ where: { id: job.id }, data: { state: CalendarPropagationState.SKIPPED, externalReturn: { reason: 'target-not-authorized' } } })
+    if (!job.targetSource.enabled || !job.targetSource.writeAuthority || job.canonicalEvent.conflict || job.syncEvent.state === CalendarSyncState.CONFLICT) {
+      await prisma.calendarPropagationJob.update({ where: { id: job.id }, data: { state: CalendarPropagationState.SKIPPED, externalReturn: { reason: job.canonicalEvent.conflict || job.syncEvent.state === CalendarSyncState.CONFLICT ? 'conflict-requires-review' : 'target-not-authorized' } } })
       results.push({ jobId: job.id, state: 'SKIPPED' })
       continue
     }
@@ -97,6 +97,7 @@ export async function processPropagationJobs(input: { syncEventId?: string; limi
     const sync = await prisma.calendarSyncEvent.findUnique({ where: { id: syncEventId } })
     if (!sync || sync.state === CalendarSyncState.CONFLICT) continue
 
+    const skipped = await prisma.calendarPropagationJob.count({where:{syncEventId,state:CalendarPropagationState.SKIPPED}})
     const remaining = await prisma.calendarPropagationJob.count({
       where: {
         syncEventId,
@@ -107,7 +108,7 @@ export async function processPropagationJobs(input: { syncEventId?: string; limi
     await prisma.calendarSyncEvent.update({
       where: { id: syncEventId },
       data: {
-        state: remaining ? CalendarSyncState.PROPAGATION_PENDING : CalendarSyncState.COMPLETED
+        state: remaining || skipped ? CalendarSyncState.PROPAGATION_PENDING : CalendarSyncState.COMPLETED
       }
     })
   }
