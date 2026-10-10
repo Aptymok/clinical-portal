@@ -252,11 +252,13 @@ export async function completeGoogleOAuth(sourceId: string, code: string) {
 
   await prisma.calendarSource.update({
     where: { id: sourceId },
-    data: { readAuthority: true, writeAuthority: true, enabled: true }
+    data: { readAuthority: true, writeAuthority: false, enabled: true, webhookEnabled: false }
   })
 
   await syncGoogleSource(sourceId)
-  return startGoogleWatch(sourceId)
+  const watch = await startGoogleWatch(sourceId)
+  await prisma.calendarSource.update({ where: { id: sourceId }, data: { writeAuthority: true, webhookEnabled: true } })
+  return watch
 }
 
 
