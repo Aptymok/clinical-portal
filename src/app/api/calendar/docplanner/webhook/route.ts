@@ -25,8 +25,8 @@ export async function POST(request: Request) {
   const normalized = normalizeDocplannerNotification(sourceId, payload)
 
   if (normalized.kind === 'availability') {
-    const result = await checkCanonicalAvailability(normalized)
     if (!source.realtimeBookingCheck) return NextResponse.json({ available: false, reason: 'REALTIME_CHECK_NOT_VERIFIED' }, { status: 503 })
+    const result = await checkCanonicalAvailability(normalized)
     return result.available
       ? new Response(null, { status: 204 })
       : NextResponse.json({ available: false, reason: 'SLOT_ALREADY_OCCUPIED' }, { status: 409 })
