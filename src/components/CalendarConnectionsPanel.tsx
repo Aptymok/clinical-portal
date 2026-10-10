@@ -47,13 +47,13 @@ export default function CalendarConnectionsPanel() {
 
       <div className="card">
         <h2>Google Calendar</h2>
-        <p>Autoriza lectura/escritura y crea el canal de notificaciones push.</p>
+        <p>Inicia OAuth para acceder a Google Calendar. Confirma después que la sincronización inicial y las notificaciones funcionan.</p>
         <a href="/api/calendar/google/connect?sourceId=google-primary"><button className="btn">Conectar Google Calendar</button></a>
       </div>
 
       <div className="card">
         <h2>Doctoralia / Docplanner</h2>
-        <p>Verifica las credenciales de Integrations API configuradas en el entorno y activa la fuente.</p>
+        <p>Verifica las credenciales de Integrations API configuradas. La verificación no habilita automáticamente escritura externa.</p>
         <button className="btn" onClick={() => post('/api/calendar/docplanner/connect')}>Verificar Doctoralia</button>
       </div>
 
