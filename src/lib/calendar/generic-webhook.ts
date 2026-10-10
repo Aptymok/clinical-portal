@@ -6,6 +6,8 @@ function writeUrl(source: CalendarSource) {
   const config = sourceConfig<GenericWebhookSourceConfig>(source.config)
   const url = config.writeUrl || process.env.THIRD_CALENDAR_WRITE_URL
   if (!url) throw new Error('Third calendar write URL is not configured')
+  const parsed = new URL(url)
+  if (parsed.protocol !== 'https:' || parsed.username || parsed.password || ['localhost','127.0.0.1','::1'].includes(parsed.hostname)) throw new Error('Third calendar destination must be an authenticated HTTPS endpoint')
   return url
 }
 
