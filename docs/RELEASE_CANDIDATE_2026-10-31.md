@@ -37,3 +37,14 @@ Los diagnósticos locales usan PGlite/PostgreSQL compatible; los proveedores ext
 ## Publicación única pendiente
 
 Después de resolver configuración y autoridad: comprobar esquema y cuenta autorizada, ejecutar la prueba externa controlada, verificar nuevamente el candidato, avanzar main una sola vez y observar su despliegue automático. No lanzar un segundo deploy manual ni una publicación intermedia para probar configuración. Verificar al final que sólo queda main y que no hay PRs abiertos.
+
+## Reobservación posterior a la creación reportada por Juan
+
+Juan reportó haber creado el recurso faltante. Se consultó de nuevo el estado real, sin publicar ni desplegar:
+
+- GitHub conserva main en d13317e; el candidato a475f6c permanece guardado sin avanzar la referencia.
+- clinical-portal en Vercel muestra únicamente GOOGLE_CLIENT_SECRET, GOOGLE_CLIENT_ID y GOOGLE_CALENDAR_ID, actualizadas el 24 de septiembre. No hay variables compartidas del equipo.
+- La vista de almacenamiento del equipo identifica Anlaysis y supabase-celeste-brush como **Uninstalled**, sin proyectos conectados. La propuesta anterior de conectar Anlaysis queda retirada hasta acreditar un recurso operativo y su pertenencia a la clínica.
+- Los conectores disponibles siguen mostrando únicamente los proyectos SystemFriction (Supabase) y SFI Continuity (Neon), y no localizan clinical-portal desde Vercel. No se reutilizaron credenciales ni almacenamiento de esos proyectos.
+
+Pendiente mínimo: obtener el enlace del recurso recién creado o su identificador visible para resolver la diferencia entre el recurso declarado y el inventario observable. No se requiere que Juan lo recree ni que comparta secretos por el chat. Después procede el enlace/mapeo del recurso correcto, comprobación de esquema, configuración y pruebas reales antes de la única publicación final.
