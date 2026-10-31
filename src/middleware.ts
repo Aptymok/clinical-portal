@@ -4,6 +4,7 @@ import type { NextRequest } from 'next/server'
 
 const DOCTORIAL_PREFIXES = ['/dashboard', '/patients', '/appointments', '/encounters', '/documents']
 const CLINICAL_API_PREFIXES = [
+  '/api/discovery',
   '/api/dashboard',
   '/api/patients',
   '/api/appointments',
@@ -25,7 +26,7 @@ export async function middleware(req: NextRequest) {
 
   if (!requiresAuth) return NextResponse.next()
 
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET })
+  const token = await getToken({ req, secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET, secureCookie: req.nextUrl.protocol === 'https:' })
   if (!token) {
     if (path.startsWith('/api/')) {
       return NextResponse.json({ error: 'UNAUTHORIZED' }, { status: 401 })
@@ -48,12 +49,14 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
+  runtime: 'nodejs',
   matcher: [
     '/dashboard/:path*',
     '/patients/:path*',
     '/appointments/:path*',
     '/encounters/:path*',
     '/documents/:path*',
+    '/api/discovery/:path*',
     '/api/dashboard/:path*',
     '/api/patients/:path*',
     '/api/appointments/:path*',

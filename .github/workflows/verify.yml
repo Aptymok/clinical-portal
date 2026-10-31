@@ -5,26 +5,50 @@ on:
   push:
     branches:
       - main
-      - delivery/calendar-discovery-governance
 
 jobs:
   verify:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: clinic_qa
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
     env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/clinical_portal
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/clinic_qa
       NEXTAUTH_URL: http://localhost:3000
       NEXTAUTH_SECRET: ci-only-secret
-      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+      NEXT_PUBLIC_SITE_URL: https://inmunoclinic.com
       CALENDAR_SYNC_SECRET: ci-calendar-secret
 
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
       - run: npm ci
       - run: npx prisma validate
       - run: npm run typecheck
       - run: npm test -- --run
       - run: npm run build
+      - run: npm run prisma:migrate:deploy
+      - name: Verify public routes, authentication, private access and persisted operations
+        run: |
+          npm run start > /tmp/clinic-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://localhost:3000/login > /dev/null; then break; fi
+            sleep 1
+          done
+          node scripts/verify-http.mjs
+          node scripts/verify-storage.mjs

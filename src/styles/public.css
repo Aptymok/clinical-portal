@@ -128,7 +128,7 @@
 .public-specialty strong{color:var(--public-navy);font-size:20px;margin-top:34px}
 .public-specialty span{color:#718092;font-size:14px;margin-top:8px}
 
-.public-section-heading{display:flex;align-items:end;justify-content:space-between;gap:32px;margin-bottom:32px}
+.public-section-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:32px;margin-bottom:32px}
 .public-section-heading h2{max-width:760px;margin-bottom:0}
 .public-text-link{color:var(--public-burgundy)!important;font-size:14px;font-weight:700;white-space:nowrap}
 .public-service-grid{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid #cad3db;border-left:1px solid #cad3db}
@@ -272,3 +272,41 @@
   .public-profile-body{padding:48px 0 64px}
   .public-profile-row{grid-template-columns:1fr;gap:4px}
 }
+
+/* Public navigation: accessible on compact screens */
+.public-mobile-menu{display:none;position:relative;color:var(--public-navy)}
+.public-mobile-menu summary{cursor:pointer;font-weight:700;list-style:revert}
+.public-mobile-menu nav{position:absolute;right:0;top:calc(100% + 12px);z-index:90;min-width:245px;background:white;border:1px solid var(--public-line);box-shadow:0 20px 40px rgba(11,44,93,.13);padding:14px;display:grid;gap:12px}
+.public-mobile-menu nav a{color:var(--public-navy);font-size:14px}
+@media(max-width:1050px){.public-mobile-menu{display:block;margin-left:auto}.public-header-inner{gap:12px}.public-header-actions{border:0;padding-left:0}}
+@media(max-width:640px){.public-brand-link{flex:0 1 170px}.public-brand-logo{max-width:170px;height:65px}.public-header-actions{display:none}.public-shell{width:min(100% - 28px,1180px)}}
+
+/* Legal information and clinical access: shared public visual grammar */
+.public-legal{max-width:860px}
+.public-legal .public-h1{margin-bottom:20px}
+.public-legal h2{margin:36px 0 10px;color:#3b2436;font-size:clamp(1.3rem,2.3vw,1.65rem)}
+.public-legal p{line-height:1.85}
+.public-legal-warning{padding:20px 24px;background:#fff4f0;border:1px solid #e9c7b9;border-radius:14px;margin:24px 0}
+.public-legal-warning p{margin-bottom:0}
+.public-footer-links{display:flex;flex-direction:column;gap:12px;margin-top:14px}
+.public-footer-links a{text-decoration:underline;text-underline-offset:4px}
+.public-login-wrap{background:linear-gradient(120deg,#fff 0%,#f9f5f7 55%,#edf4f7 100%);min-height:72vh;padding:clamp(55px,7vw,110px) 0}
+.public-login-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr);align-items:center;gap:clamp(32px,6vw,90px)}
+.public-login-intro h1{font-size:clamp(2.3rem,4.5vw,4.8rem);line-height:1.08;letter-spacing:-.04em;color:#3d2032;margin:18px 0}
+.public-login-intro>p{max-width:650px;line-height:1.7}
+.public-login-points{display:grid;gap:14px;margin:30px 0}
+.public-login-points>div{display:grid;gap:5px;padding-left:16px;border-left:2px solid #a77e93}
+.public-login-points strong{color:#3d2032}
+.public-login-points span{font-size:.9rem}
+.public-login-panel{padding:clamp(24px,4vw,48px)!important;border-radius:22px!important}
+.public-login-panel h2{font-size:2rem;color:#3d2032;margin:14px 0}
+.public-login-panel p{line-height:1.6}
+.public-login-form{display:grid;gap:12px;margin:25px 0}
+.public-login-form label{font-size:.85rem;font-weight:700;color:#463747}
+.public-login-form input{width:100%;box-sizing:border-box;border:1px solid #d8cdd5;background:#fff;border-radius:10px;padding:14px 16px;font-size:1rem;color:#312231}
+.public-login-form input:focus{outline:2px solid #728eab;outline-offset:2px}
+.public-login-form button{cursor:pointer;border:0;justify-content:center;font-size:1rem;padding:15px}
+.public-login-form button:disabled{opacity:.6;cursor:wait}
+.public-login-error{color:#9a2437;font-weight:700}
+.public-login-note{font-size:.82rem;color:#706470}
+@media(max-width:850px){.public-login-grid{grid-template-columns:1fr}.public-login-wrap{padding:42px 0}}

@@ -1,0 +1,19 @@
+import Link from 'next/link'
+import Header from '@/components/Header'
+import Footer from '@/components/Footer'
+import DiscoveryReviewForm from '@/components/DiscoveryReviewForm'
+import { prisma } from '@/lib/prisma'
+import { requireStaffPage } from '@/lib/staff-access'
+import { identityFields, ObservationSchema, compareIdentity, latestObservations } from '@/lib/discovery/review'
+export const dynamic = 'force-dynamic'
+export default async function DiscoveryPage() {
+  await requireStaffPage()
+  const events = await prisma.domainEvent.findMany({where:{type:'DISCOVERY_OBSERVATION_V1'},orderBy:{createdAt:'desc'},take:200})
+  const observations = events.flatMap(event => {
+    const parsed = ObservationSchema.safeParse(event.payload)
+    return parsed.success ? [{...parsed.data,id:event.id,createdAt:event.createdAt}] : []
+  })
+  const latest = latestObservations(observations)
+  const differences = latest.filter(item=>compareIdentity(item.field,item.observedValue).status==='REVIEW').length
+  return <><Header/><main className="container page clinic-workspace"><p className="eyebrow">IDENTIDAD DIGITAL · DISCOVERY MESH</p><h1>Una identidad, en cada punto de contacto.</h1><p>Contrasta los perfiles públicos con la información oficial del consultorio. Cada revisión queda registrada; un cambio solicitado no equivale a un cambio publicado.</p><div className="master-stats"><div><span>Fuentes y campos revisados</span><strong>{latest.length}</strong></div><div><span>Diferencias por revisar</span><strong>{differences}</strong></div><div><span>Observaciones en esta vista</span><strong>{observations.length}</strong></div></div><div className="clinic-grid"><section className="card"><h2>Información oficial de referencia</h2><p>Base conservada del registro del consultorio. Las diferencias de formato también requieren revisión; no se declaran falsas automáticamente.</p><dl>{Object.entries(identityFields).map(([key,item])=><div className="clinic-definition" key={key}><dt>{item.label}</dt><dd>{item.value}</dd></div>)}</dl><Link href="/dr-jesus-guillermo-espinoza-contreras">Ver perfil público →</Link></section><section className="card"><DiscoveryReviewForm/></section></div><section className="card" style={{marginTop:24}}><h2>Última observación por fuente y dato</h2><p>Se muestran hasta 200 observaciones recientes. El historial se conserva en el sistema; registrar de nuevo la misma fuente actualiza su situación visible.</p>{latest.length?<div className="table-scroll"><table><thead><tr><th>Fuente y fecha</th><th>Dato</th><th>Observado</th><th>Contraste actual</th></tr></thead><tbody>{latest.map(item=><tr key={item.id}><td><a href={item.sourceUrl} target="_blank" rel="noopener noreferrer">{new URL(item.sourceUrl).hostname} ↗</a><br/><small>{item.createdAt.toLocaleString('es-MX',{timeZone:'America/Mexico_City'})}</small></td><td>{identityFields[item.field].label}</td><td>{item.observedValue}</td><td><span className="clinic-badge">{compareIdentity(item.field,item.observedValue).status==='MATCH'?'Coincide':'Revisar diferencia'}</span></td></tr>)}</tbody></table></div>:<p>Aún no hay revisiones registradas. No se ha ejecutado un rastreo automático desde esta pantalla.</p>}</section><section className="card" style={{marginTop:24}}><h2>Cómo cerrar una diferencia</h2><ol><li>Verificar que se trata del médico correcto y conservar el enlace.</li><li>Solicitar la corrección en la plataforma con la cuenta autorizada del consultorio.</li><li>Volver a abrir el perfil y registrar el dato efectivamente publicado.</li></ol><p>Este módulo no envía denuncias, no elimina perfiles y no modifica buscadores. Las solicitudes externas necesitan acceso y evidencia específicos.</p></section></main><Footer/></>
+}

@@ -2,7 +2,7 @@
 import React from 'react'
 
 type Person = { firstName: string, lastName: string }
-type Patient = { id: string, mrn?: string, person: Person }
+type Patient = { id: string, mrn?: string | null, person: Person }
 
 export default function PatientsTable({ patients }: { patients: Patient[] }){
   return (

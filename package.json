@@ -17,7 +17,7 @@
   "dependencies": {
     "@auth/prisma-adapter": "^2.7.4",
     "@prisma/client": "^6.6.0",
-    "next": "14.2.4",
+    "next": "15.5.28",
     "next-auth": "^5.0.0-beta.25",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -29,7 +29,7 @@
     "@typescript-eslint/eslint-plugin": "^8.64.0",
     "@typescript-eslint/parser": "^8.64.0",
     "eslint": "^8.57.1",
-    "eslint-config-next": "^14.2.4",
+    "eslint-config-next": "15.5.28",
     "prisma": "^6.6.0",
     "tsx": "^4.19.3",
     "typescript": "5.1.6",

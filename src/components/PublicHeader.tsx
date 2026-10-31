@@ -1,31 +1,4 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { publicBrandLogo } from '@/config/public-brand'
-
-export default function PublicHeader() {
-  return (
-    <header className="public-header">
-      <div className="public-shell public-header-inner">
-        <Link href="/" className="public-brand-link" aria-label="Inmunoclinic — Inicio">
-          <img
-            src={publicBrandLogo}
-            alt="Dr. Jesús Guillermo Espinoza Contreras — Inmunoclinic"
-            className="public-brand-logo"
-          />
-        </Link>
-
-        <nav className="public-nav" aria-label="Navegación pública">
-          <Link href="/#sobre">Sobre el Dr.</Link>
-          <Link href="/#especialidades">Especialidades</Link>
-          <Link href="/#servicios">Servicios</Link>
-          <Link href="/#vacunas">Vacunas</Link>
-          <Link href="/#ubicacion">Ubicación</Link>
-        </nav>
-
-        <div className="public-header-actions">
-          <a className="public-phone-link" href="tel:+524499966500">449 996 6500</a>
-          <Link className="public-cta public-cta-small" href="/#contacto">Agendar cita</Link>
-        </div>
-      </div>
-    </header>
-  )
-}
+export default function PublicHeader(){return <header className="public-header"><div className="public-shell public-header-inner"><Link href="/" className="public-brand-link" aria-label="Inmunoclinic — Inicio"><Image unoptimized width={245} height={90} src={publicBrandLogo} alt="Inmunoclinic" className="public-brand-logo"/></Link><nav className="public-nav" aria-label="Navegación pública"><Link href="/">Inicio</Link><Link href="/dr-jesus-guillermo-espinoza-contreras">El Dr. y Especialidades</Link><Link href="/servicios-y-vacunas">Servicios y Vacunas</Link><Link href="/ubicacion-y-contacto">Ubicación y Contacto</Link></nav><details className="public-mobile-menu"><summary>Menú</summary><nav aria-label="Navegación móvil"><Link href="/">Inicio</Link><Link href="/dr-jesus-guillermo-espinoza-contreras">El Dr. y Especialidades</Link><Link href="/servicios-y-vacunas">Servicios y Vacunas</Link><Link href="/ubicacion-y-contacto">Ubicación y Contacto</Link><Link href="/login?callbackUrl=%2Fdashboard">Acceso del doctor</Link></nav></details><div className="public-header-actions"><Link className="public-phone-link" href="/login?callbackUrl=%2Fdashboard">Acceso del doctor</Link><Link className="public-cta public-cta-small" href="/ubicacion-y-contacto">Agendar cita →</Link></div></div></header>}

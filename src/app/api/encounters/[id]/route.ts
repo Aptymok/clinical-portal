@@ -1,12 +1,14 @@
+import { requireStaffApi } from '@/lib/staff-access'
 import { prisma } from '@/lib/prisma'
 import { jsonErrorResponse, jsonSuccess } from '@/lib/errors'
 import { parseJsonBody, validateSchema } from '@/lib/validation'
 import { EncounterPatchSchema } from '@/schemas/encounter.schema'
 import { logAudit } from '@/lib/audit'
 
-export async function GET(_req: Request, { params }: { params: { id: string } }){
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }){
   try{
-    const id = params.id
+    await requireStaffApi()
+    const id = (await params).id
     const item = await prisma.encounter.findUnique({
       where: { id },
       include: {
@@ -23,9 +25,10 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
   }
 }
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }){
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }){
   try{
-    const id = params.id
+    await requireStaffApi()
+    const id = (await params).id
     const body = await parseJsonBody<any>(req)
     const data = validateSchema(EncounterPatchSchema, body)
     const updated = await prisma.encounter.update({ where: { id }, data: data as any })

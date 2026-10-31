@@ -1,3 +1,4 @@
+import { requireStaffPage } from '@/lib/staff-access'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
@@ -6,9 +7,10 @@ import { prisma } from '@/lib/prisma'
 
 export const dynamic = 'force-dynamic'
 
-export default async function PatientDetail({ params }: { params: { id: string } }) {
+export default async function PatientDetail({ params }: { params: Promise<{ id: string }> }) {
+  await requireStaffPage()
   const patient = await prisma.patient.findUnique({
-    where: { id: params.id },
+    where: { id: (await params).id },
     include: {
       person: true,
       appointments: {

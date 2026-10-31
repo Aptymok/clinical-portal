@@ -1,3 +1,4 @@
+import { maintenanceResult } from '@/lib/calendar/maintenance-result'
 import { NextResponse } from 'next/server'
 import { hasValidCalendarSyncSecret } from '@/lib/calendar/integration-auth'
 import { prisma } from '@/lib/prisma'
@@ -12,9 +13,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'UNAUTHORIZED' }, { status: 401 })
   }
 
+  const errors: string[] = []
   let pulled = 0
   const doctoralia = await prisma.calendarSource.findUnique({ where: { id: 'doctoralia' } })
-  if (doctoralia?.readAuthority) {
+  if (doctoralia?.enabled && doctoralia.readAuthority) {
     try {
       const notifications = await pullDocplannerNotifications('doctoralia')
       for (const payload of notifications) {
@@ -25,6 +27,7 @@ export async function POST(request: Request) {
         pulled += 1
       }
     } catch (error) {
+      errors.push('DOCPLANNER_PULL_FAILED')
       console.error('Docplanner maintenance pull failed', error)
     }
   }
@@ -42,11 +45,15 @@ export async function POST(request: Request) {
         await startGoogleWatch(source.id)
         renewed += 1
       } catch (error) {
+        errors.push('GOOGLE_WATCH_FAILED')
         console.error('Google watch renewal failed', source.id, error)
       }
     }
   }
 
   const propagation = await processPropagationJobs({ limit: 50 })
-  return NextResponse.json({ pulled, renewed, propagation })
+  const sources = googleSources.length + (doctoralia?.enabled && doctoralia.readAuthority ? 1 : 0)
+  const status = maintenanceResult(sources, errors, propagation)
+  await prisma.domainEvent.create({data:{type:'CALENDAR_MAINTENANCE_RETURN_V1',payload:{status,sources,pulled,renewed,errors,jobCount:propagation.length,observedAt:new Date().toISOString()}}})
+  return NextResponse.json({ status, pulled, renewed, propagation, errors }, {status:status==='PARTIAL'?502:200})
 }

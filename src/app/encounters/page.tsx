@@ -1,3 +1,4 @@
+import { requireStaffPage } from '@/lib/staff-access'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import EncountersTable from '@/components/EncountersTable'
@@ -6,6 +7,7 @@ import { prisma } from '@/lib/prisma'
 export const dynamic = 'force-dynamic'
 
 export default async function Encounters(){
+  await requireStaffPage()
   const items = await prisma.encounter.findMany({
     include: {
       patient: { include: { person: true } },

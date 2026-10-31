@@ -1,3 +1,5 @@
+import AppointmentOutcome from '@/components/AppointmentOutcome'
+import { requireStaffPage } from '@/lib/staff-access'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
@@ -6,9 +8,10 @@ import { prisma } from '@/lib/prisma'
 
 export const dynamic = 'force-dynamic'
 
-export default async function AppointmentDetail({ params }: { params: { id: string } }) {
+export default async function AppointmentDetail({ params }: { params: Promise<{ id: string }> }) {
+  await requireStaffPage()
   const item = await prisma.appointment.findUnique({
-    where: { id: params.id },
+    where: { id: (await params).id },
     include: {
       patient: { include: { person: true } },
       provider: { include: { person: true } }
@@ -47,6 +50,7 @@ export default async function AppointmentDetail({ params }: { params: { id: stri
             <p><strong>Motivo:</strong> {item.reason ?? 'Sin motivo registrado'}</p>
             <p><strong>Notas:</strong> {item.notes ?? 'Sin notas'}</p>
           </div>
+          <AppointmentOutcome id={item.id} status={item.status}/>
         </div>
       </div>
       <Footer />

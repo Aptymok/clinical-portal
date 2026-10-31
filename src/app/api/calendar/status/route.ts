@@ -23,7 +23,7 @@ export async function GET() {
       connection = {
         calendarId: source.externalRef || config.calendarId || 'primary',
         oauthConnected: Boolean(source.secret),
-        watchActive: Boolean(config.watchChannelId && config.watchExpiration),
+        watchActive: Boolean(config.watchChannelId && Number(config.watchExpiration) > Date.now()),
         watchExpiration: config.watchExpiration || null
       }
     } else if (source.providerType === 'DOCPLANNER') {
@@ -62,7 +62,7 @@ export async function GET() {
     openAlerts: alerts,
     endpoints: {
       googleRedirectUri: `${(process.env.NEXT_PUBLIC_SITE_URL || '').replace(/\/$/, '')}/api/calendar/google/callback`,
-      docplannerWebhookPath: '/api/calendar/docplanner/webhook?sourceId=doctoralia&token=<DOCPLANNER_WEBHOOK_SECRET>',
+      docplannerWebhookPath: '/api/calendar/docplanner/webhook',
       genericIntakePath: '/api/calendar/intake',
       availabilityGatePath: '/api/calendar/availability',
       maintenancePath: '/api/calendar/maintenance'

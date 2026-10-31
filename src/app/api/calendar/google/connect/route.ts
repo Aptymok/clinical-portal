@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server'
 import { signCalendarOAuthState } from '@/lib/calendar/oauth-state'
 import { googleRedirectUri } from '@/lib/calendar/google'
+import { prisma } from '@/lib/prisma'
 
 export async function GET(request: Request) {
   const url = new URL(request.url)
   const sourceId = url.searchParams.get('sourceId') || 'google-primary'
+  const source = await prisma.calendarSource.findUnique({ where: { id: sourceId } })
+  if (!source || source.providerType !== 'GOOGLE_CALENDAR') return NextResponse.json({ error: 'INVALID_GOOGLE_CALENDAR_SOURCE' }, { status: 404 })
   const clientId = process.env.GOOGLE_CLIENT_ID
   if (!clientId) return NextResponse.json({ error: 'GOOGLE_CLIENT_ID_NOT_CONFIGURED' }, { status: 503 })
 

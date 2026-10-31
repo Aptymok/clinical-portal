@@ -1,3 +1,15 @@
+# Estado operativo · 31 de octubre de 2026
+
+La implementación se consolida en `main`. La propuesta pública #11 se integra con el portal profesional existente; se conserva el logo y el canon de Inmunoclinic.
+
+**Recorridos:** `/` → información y contacto; `/login` → `/dashboard` → agenda, resultados y supervisión; `/dashboard/discovery` → registro y contraste de presencia digital.
+
+Las conexiones externas, el aviso integral y la publicación productiva tienen pendientes explícitos. No se simulan pacientes, citas, agentes ni correcciones realizadas. Consulta [el estado y sus límites](docs/INTEGRATION_RETURN_2026-10-31.md).
+
+**Verificación:** `npm ci`, `npm run prisma:generate`, `npm run typecheck`, `npm test -- --run`, `npm run build`. Con el servidor iniciado, `node scripts/verify-http.mjs` verifica acceso público y denegación anónima. `scripts/verify-storage.mjs` se ejecuta únicamente en la base local desechable `/clinic_qa`; crea datos sintéticos y nunca debe apuntar a producción. El workflow prepara y verifica esa base automáticamente.
+
+---
+
 # Portal de Seguimiento Clínico
 
 ## Especificaciones del sistema

@@ -1,29 +1,4 @@
 "use client";
 import Link from 'next/link';
-
-export default function Header(){
-  return (
-    <header className="site-header">
-      <div className="container">
-        <div className="brand">
-          <div className="logo" aria-hidden />
-          <div>
-            <h1>PORTAL CLÍNICO</h1>
-            <div style={{fontSize:12,color:'var(--white)',opacity:0.9}}>Gestión Integral de Salud</div>
-          </div>
-        </div>
-        <nav className="nav" aria-label="Main navigation">
-          <Link href="/">Inicio</Link>
-          <Link href="/patients">Pacientes</Link>
-          <Link href="/dashboard">Profesionales</Link>
-          <Link href="/appointments">Citas</Link>
-          <Link href="/encounters">Consultas</Link>
-          <Link href="/documents">Documentos</Link>
-        </nav>
-        <div style={{marginLeft:12}}>
-          <Link href="/login"><button className="btn">Iniciar sesión</button></Link>
-        </div>
-      </div>
-    </header>
-  )
-}
+import { signOut } from 'next-auth/react';
+export default function Header(){return <header className="site-header"><div className="container"><div className="brand"><div><h1>INMUNOCLINIC</h1><div style={{fontSize:12,opacity:.9}}>Portal profesional · Gestión clínica</div></div></div><nav className="nav" aria-label="Navegación profesional"><Link href="/dashboard">Resumen</Link><Link href="/dashboard/discovery">Identidad digital</Link><Link href="/dashboard/calendar">Agenda maestra</Link><Link href="/appointments">Citas</Link><Link href="/patients">Pacientes</Link><Link href="/encounters">Consultas</Link><Link href="/dashboard/calendar-integrations">Calendarios</Link><Link href="/documents">Documentos</Link></nav><button className="btn" onClick={()=>signOut({callbackUrl:'/login'})}>Cerrar sesión</button><div style={{marginLeft:12}}><Link href="/">Sitio público ↗</Link></div></div></header>}

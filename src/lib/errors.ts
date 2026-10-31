@@ -43,7 +43,7 @@ export function jsonErrorResponse(err: unknown){
         { status: 400 }
     );
   }
-  const message = err instanceof Error ? err.message : 'Unknown error'
+  const message = 'No fue posible completar la operación. Inténtalo de nuevo o contacta a la administración.'
   return NextResponse.json({ success: false, error: { code: 'SERVER_ERROR', message } }, { status: 500 })
 }
 

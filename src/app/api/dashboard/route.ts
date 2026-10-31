@@ -1,14 +1,17 @@
+import { requireStaffApi } from '@/lib/staff-access'
 import { prisma } from '@/lib/prisma'
 import { jsonErrorResponse, jsonSuccess } from '@/lib/errors'
 
 export async function GET() {
   try {
+    await requireStaffApi()
     const [patientsCount, appointmentsCount, encountersCount, upcomingAppointments] = await Promise.all([
       prisma.patient.count(),
       prisma.appointment.count(),
       prisma.encounter.count(),
       prisma.appointment.findMany({
         where: {
+          status: 'SCHEDULED',
           scheduledFor: {
             gte: new Date(),
             lte: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7)

@@ -1,13 +1,25 @@
 {
-  "generatedAt": "2026-07-15T00:00:00Z",
-  "site": "/",
+  "name": "Inmunoclinic",
+  "scope": "public-information-only",
   "routes": [
-    {"path":"/","method":"GET","description":"Landing / Dashboard"},
-    {"path":"/login","method":"GET","description":"Login page"},
-    {"path":"/api/auth/*","method":"POST/GET","description":"NextAuth routes"},
-    {"path":"/api/patients","method":"GET/POST","description":"Patients collection (CRUD missing)"},
-    {"path":"/api/appointments","method":"GET/POST","description":"Appointments (CRUD missing)"},
-    {"path":"/api/encounters","method":"GET/POST","description":"Encounters (CRUD missing)"},
-    {"path":"/api/documents","method":"POST/GET","description":"Document upload/download (Supabase not integrated)"}
-  ]
+    {
+      "path": "/",
+      "title": "Inicio"
+    },
+    {
+      "path": "/dr-jesus-guillermo-espinoza-contreras",
+      "title": "Doctor y especialidades"
+    },
+    {
+      "path": "/servicios-y-vacunas",
+      "title": "Servicios y vacunas"
+    },
+    {
+      "path": "/ubicacion-y-contacto",
+      "title": "Ubicación y contacto"
+    }
+  ],
+  "privateRoutesExcluded": true,
+  "externalAutomatedBooking": false,
+  "authenticatedMcp": false
 }
