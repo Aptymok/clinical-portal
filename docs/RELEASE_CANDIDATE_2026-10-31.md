@@ -48,3 +48,11 @@ Juan reportó haber creado el recurso faltante. Se consultó de nuevo el estado 
 - Los conectores disponibles siguen mostrando únicamente los proyectos SystemFriction (Supabase) y SFI Continuity (Neon), y no localizan clinical-portal desde Vercel. No se reutilizaron credenciales ni almacenamiento de esos proyectos.
 
 Pendiente mínimo: obtener el enlace del recurso recién creado o su identificador visible para resolver la diferencia entre el recurso declarado y el inventario observable. No se requiere que Juan lo recree ni que comparta secretos por el chat. Después procede el enlace/mapeo del recurso correcto, comprobación de esquema, configuración y pruebas reales antes de la única publicación final.
+
+## Configuración observada después de guardar las variables
+
+Se actualizaron los datos desde la página del proyecto en Vercel. DATABASE_URL, NEXT_PUBLIC_SITE_URL, AUTH_SECRET, ENCRYPTION_KEY y CALENDAR_SYNC_SECRET aparecen guardadas para Production. No se revelaron sus valores; presencia no equivale a formato válido ni conexión comprobada.
+
+El proyecto clínico comunicado por Juan es ojhhjwnwqegepuzhqcqd. El conector Supabase deniega tanto sus metadatos como la lista de tablas: `You do not have permission to perform this action`. No se intentó usar una base de SFI como sustituto. Queda pendiente habilitar acceso al proyecto clínico mediante una conexión autorizada o su panel web.
+
+Se añadió una migración de privacidad limitada a las tablas propias del portal: activa RLS y revoca acceso público/anon/authenticated, conservando el acceso del servidor propietario. La prueba falló antes de añadir la migración y pasó después en la base desechable, con roles públicos equivalentes creados para el ensayo. No se ha aplicado a producción. La suite conserva 27 pruebas unitarias y el diagnóstico de calendario/privacidad tiene ahora 14 escenarios locales. Las respuestas de proveedores siguen siendo simuladas.

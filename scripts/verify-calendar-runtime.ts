@@ -14,10 +14,15 @@ async function main() {
         throw new Error('Disposable QA database only');
     for (const id of ['qa-a', 'qa-b'])
         await prisma.calendarSource.create({ data: { id, name: id, providerType: 'GENERIC_WEBHOOK', readAuthority: true, writeAuthority: false, lastSyncAt: new Date(), enabled: true } });
+    const privacy = await prisma.$queryRaw<Array<{relname:string;relrowsecurity:boolean}>>`SELECT c.relname,c.relrowsecurity FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relname IN ('Patient','User','CalendarConnectionSecret')`;
+    assert.equal(privacy.length,3);
+    assert.ok(privacy.every(table=>table.relrowsecurity),'Clinical tables must deny direct public Data API access');
+    const publicAccess = await prisma.$queryRaw<Array<{exposed:boolean}>>`SELECT has_table_privilege(r.oid, 'public."Patient"', 'SELECT') AS exposed FROM pg_roles r WHERE rolname IN ('anon','authenticated')`;
+    assert.ok(publicAccess.every(role=>!role.exposed),'Public client roles must not read patient tables');
     let serial = 0;
     const event = (key: string, source = 'qa-a', start = '2030-01-01T10:00:00-06:00', end = '2030-01-01T10:30:00-06:00', updated = '2026-10-31T10:00:00Z') => ({ sourceId: source, externalEventId: key + '-' + source, correlationKey: key, providerRef: 'qa-doctor', startsAt: start, endsAt: end, timezone: 'America/Mexico_City', status: 'SCHEDULED' as const, sourceUpdatedAt: updated });
     const ingest = (value: any) => ingestCalendarEvent(value, 'qa-audit-' + (++serial));
-    const results: any[] = [];
+    const results: any[] = [{test:'Tablas clínicas protegidas con RLS y sin lectura para clientes públicos',pass:true}];
     await ingest(event('contradiction'));
     const contradiction = await ingest(event('contradiction', 'qa-b', '2030-01-01T11:00:00-06:00', '2030-01-01T11:30:00-06:00'));
     results.push({ test: 'Contradicción entre fuentes del mismo evento', expected: 'conflict=true', observed: { conflict: contradiction.conflicts, startsAt: contradiction.canonicalEvent?.startsAt }, pass: contradiction.conflicts === true });
