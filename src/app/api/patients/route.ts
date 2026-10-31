@@ -1,3 +1,4 @@
+import {requireSameOrigin} from '@/lib/same-origin'
 import { requireStaffApi } from '@/lib/staff-access'
 import { prisma } from '@/lib/prisma'
 import { jsonErrorResponse, jsonSuccess } from '@/lib/errors'
@@ -18,6 +19,7 @@ export async function GET(){
 export async function POST(req: Request){
   try{
     await requireStaffApi()
+    requireSameOrigin(req)
     const body = await parseJsonBody<any>(req)
     const data = validateSchema(PatientCreateSchema, body)
     const created = await prisma.patient.create({ data: { mrn: data.mrn, person: { create: data.person } }, include: { person: true } })

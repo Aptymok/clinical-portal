@@ -112,7 +112,7 @@ Normalized body:
 
 Outbound:
 Set THIRD_CALENDAR_WRITE_URL to a receiver owned by the third system.
-Optionally set THIRD_CALENDAR_WEBHOOK_SECRET; outbound bodies receive an HMAC SHA-256 signature in x-clinical-calendar-signature.
+Set THIRD_CALENDAR_WEBHOOK_SECRET (required); outbound bodies receive an HMAC SHA-256 signature in x-clinical-calendar-signature.
 
 If the third system reflects a Clinical Portal write back into the intake endpoint, it must send:
 - correlationKey = canonical key received from Clinical Portal;
@@ -168,3 +168,12 @@ The integration is not closed until this exact test succeeds:
 9. Re-read all three sources and persist external RETURNS.
 
 Only then can the three-calendar convergence be marked operational.
+
+
+## Release candidate 2026-10-31
+
+Set `CALENDAR_INTERNAL_PROVIDER_ID` to the existing Provider record representing the doctor; `CALENDAR_PROVIDER_REF` is its external reference (default `dr-guillermo`). Never infer this mapping from patient/provider names. Observations older than 15 minutes, expired Google watches, required disabled sources and unconfirmed propagation do not certify availability. Individual intake events do not refresh full-source observation time.
+
+The generic outbound adapter requires an authenticated HTTPS endpoint, a signing secret, and a JSON receipt containing `observed: true`, the exact `canonicalKey`, `action`, `status` and, for an upsert, matching `startsAt`/`endsAt`. This is a receipt contract; the third provider still needs identification and real verification.
+
+`node scripts/check-release-readiness.mjs` checks the configured environment without writes. `node --import tsx scripts/verify-calendar-runtime.ts` is restricted to the disposable `/clinic_qa` database and uses simulated provider responses; it is not a live-calendar certification.

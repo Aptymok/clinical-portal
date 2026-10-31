@@ -4,6 +4,7 @@ import type { NextRequest } from 'next/server'
 
 const DOCTORIAL_PREFIXES = ['/dashboard', '/patients', '/appointments', '/encounters', '/documents']
 const CLINICAL_API_PREFIXES = [
+  '/api/reminders',
   '/api/discovery',
   '/api/dashboard',
   '/api/patients',
@@ -56,6 +57,7 @@ export const config = {
     '/appointments/:path*',
     '/encounters/:path*',
     '/documents/:path*',
+    '/api/reminders/:path*',
     '/api/discovery/:path*',
     '/api/dashboard/:path*',
     '/api/patients/:path*',

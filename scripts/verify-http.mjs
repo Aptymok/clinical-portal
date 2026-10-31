@@ -10,13 +10,13 @@ for (const path of ['/', '/login', '/servicios-y-vacunas','/ubicacion-y-contacto
   if(path==='/sitemap.xml') assert.ok(!body.includes('localhost'))
   console.log('PUBLIC_OK',path)
 }
-for (const path of ['/dashboard','/dashboard/discovery','/dashboard/calendar','/patients','/documents','/appointments','/encounters']) {
+for (const path of ['/portal','/dashboard/follow-up','/dashboard','/dashboard/discovery','/dashboard/calendar','/patients','/documents','/appointments','/encounters']) {
   const response = await fetch(base+path,{redirect:'manual'})
   assert.equal(response.status,307,path)
   assert.ok(response.headers.get('location')?.includes('/login'),path)
   console.log('PRIVATE_REDIRECT_OK',path)
 }
-for(const [path,method] of [['/api/patients','GET'],['/api/dashboard','GET'],['/api/appointments','GET'],['/api/documents','GET'],['/api/discovery','POST'],['/api/calendar/status','GET']]) {
+for(const [path,method] of [['/api/portal','GET'],['/api/reminders','POST'],['/api/patients','GET'],['/api/dashboard','GET'],['/api/appointments','GET'],['/api/documents','GET'],['/api/discovery','POST'],['/api/calendar/status','GET']]) {
   const response=await fetch(base+path,{method})
   assert.equal(response.status,401,path)
   console.log('PRIVATE_API_DENIED',path)

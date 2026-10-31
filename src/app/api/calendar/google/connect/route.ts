@@ -1,3 +1,4 @@
+import { randomBytes } from 'node:crypto'
 import { NextResponse } from 'next/server'
 import { signCalendarOAuthState } from '@/lib/calendar/oauth-state'
 import { googleRedirectUri } from '@/lib/calendar/google'
@@ -11,7 +12,7 @@ export async function GET(request: Request) {
   const clientId = process.env.GOOGLE_CLIENT_ID
   if (!clientId) return NextResponse.json({ error: 'GOOGLE_CLIENT_ID_NOT_CONFIGURED' }, { status: 503 })
 
-  const state = signCalendarOAuthState({ sourceId, issuedAt: Date.now() })
+  const state = signCalendarOAuthState({ sourceId, issuedAt: Date.now(), nonce: randomBytes(24).toString('base64url') })
   const auth = new URL('https://accounts.google.com/o/oauth2/v2/auth')
   auth.searchParams.set('client_id', clientId)
   auth.searchParams.set('redirect_uri', googleRedirectUri())
@@ -21,5 +22,7 @@ export async function GET(request: Request) {
   auth.searchParams.set('prompt', 'consent')
   auth.searchParams.set('state', state)
 
-  return NextResponse.redirect(auth)
+  const response=NextResponse.redirect(auth)
+  response.cookies.set('clinical-calendar-state',state,{httpOnly:true,secure:new URL(request.url).protocol==='https:',sameSite:'lax',path:'/api/calendar/google/callback',maxAge:900})
+  return response
 }

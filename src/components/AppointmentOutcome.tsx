@@ -12,7 +12,7 @@ export default function AppointmentOutcome({id,status}:{id:string;status:string}
     try {
       const response=await fetch('/api/appointments/'+encodeURIComponent(id),{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:selected})})
       if(!response.ok) throw new Error('No fue posible registrar el resultado. Comprueba tu sesión y vuelve a intentar.')
-      setMessage('Resultado guardado en la cita interna. No se modificaron calendarios externos.');router.refresh()
+      setMessage('Resultado guardado. Los cambios de ocupación generan envíos a destinos autorizados; consulta su confirmación en Calendarios.');router.refresh()
     } catch(error) {setMessage(error instanceof Error?error.message:'No se pudo guardar.')}
     finally{setBusy(false)}
   }

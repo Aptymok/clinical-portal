@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 
 type Health = {
+  coverage: {verified:boolean;unverifiedSources:string[]}
   sources: Array<{
     id: string
     name: string
@@ -80,7 +81,7 @@ export default function CalendarConnectionsPanel() {
       {message ? <p role="status">{message}</p> : null}
 
       <div className="card">
-        <h2>Estado</h2>
+        <h2>Estado</h2><p role="status">{health?.coverage?.verified ? "Observaciones recientes en todas las fuentes requeridas." : "Disponibilidad sin verificar: revisa conexiones, vigencia y fuentes deshabilitadas."}</p>
         <p>Propagaciones pendientes: {health?.pendingPropagationJobs ?? '—'} · Alertas abiertas: {health?.openAlerts ?? '—'}</p>
         {(health?.sources || []).map((source) => (
           <div key={source.id} style={{ borderTop: '1px solid #e6e6e6', padding: '12px 0' }}>

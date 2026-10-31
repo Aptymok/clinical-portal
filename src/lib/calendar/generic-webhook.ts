@@ -23,10 +23,13 @@ async function send(source: CalendarSource, event: CanonicalCalendarEvent, actio
   })
 
   const secret = process.env.THIRD_CALENDAR_WEBHOOK_SECRET || ''
+  if (!secret) throw new Error('Third calendar signing secret is required')
   const signature = secret ? createHmac('sha256', secret).update(body).digest('hex') : ''
 
   const response = await fetch(writeUrl(source), {
     method: 'POST',
+    redirect: 'error',
+    signal: AbortSignal.timeout(15000),
     headers: {
       'content-type': 'application/json',
       ...(signature ? { 'x-clinical-calendar-signature': signature } : {})
@@ -36,6 +39,7 @@ async function send(source: CalendarSource, event: CanonicalCalendarEvent, actio
 
   if (!response.ok) throw new Error(`Third calendar webhook failed: ${response.status}`)
   const observedState = await response.json().catch(() => ({ status: response.status }))
+  if (observedState.observed !== true || observedState.canonicalKey !== event.canonicalKey || observedState.action !== action || observedState.status !== event.status || (action !== 'CANCEL_OR_FREE' && (Date.parse(observedState.startsAt) !== +event.startsAt || Date.parse(observedState.endsAt) !== +event.endsAt))) throw new Error('Third calendar receipt does not verify the requested event state')
   return { observedState }
 }
 

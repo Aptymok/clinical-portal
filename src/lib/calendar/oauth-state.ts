@@ -3,11 +3,12 @@ import { createHmac, timingSafeEqual } from 'node:crypto'
 type OAuthState = {
   sourceId: string
   issuedAt: number
+  nonce?: string
 }
 
 function secret() {
-  const value = process.env.NEXTAUTH_SECRET
-  if (!value) throw new Error('NEXTAUTH_SECRET is required')
+  const value = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET
+  if (!value) throw new Error('AUTH_SECRET is required')
   return value
 }
 

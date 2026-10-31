@@ -15,7 +15,7 @@ jobs:
           CALENDAR_SYNC_SECRET: ${{ secrets.CALENDAR_SYNC_SECRET }}
         run: |
           if [ -z "$CLINICAL_PORTAL_URL" ] || [ -z "$CALENDAR_SYNC_SECRET" ]; then
-            echo "Calendar maintenance secrets are not configured; skipping."
-            exit 0
+            echo "::error::Calendar maintenance is BLOCKED: required secrets are not configured."
+            exit 1
           fi
           curl --fail-with-body --silent --show-error             -X POST "$CLINICAL_PORTAL_URL/api/calendar/maintenance"             -H "Authorization: Bearer $CALENDAR_SYNC_SECRET"

@@ -1,3 +1,4 @@
+import { calendarCoverage } from '@/lib/calendar/coverage'
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { sourceConfig, type DocplannerSourceConfig, type GoogleSourceConfig, type GenericWebhookSourceConfig } from '@/lib/calendar/source-config'
@@ -58,6 +59,7 @@ export async function GET() {
 
   return NextResponse.json({
     sources: publicSources,
+    coverage: calendarCoverage(sources),
     pendingPropagationJobs: pending,
     openAlerts: alerts,
     endpoints: {

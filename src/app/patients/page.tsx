@@ -1,3 +1,4 @@
+import PatientForm from '@/components/PatientForm'
 import { requireStaffPage } from '@/lib/staff-access'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
@@ -19,7 +20,7 @@ export default async function Patients(){
       <div className="container page">
         <h2>Pacientes</h2>
         <div className="card">
-          <PatientsTable patients={patients} />
+          <PatientsTable patients={patients} /><PatientForm/>
         </div>
       </div>
       <Footer />

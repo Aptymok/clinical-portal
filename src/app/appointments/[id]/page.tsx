@@ -1,3 +1,4 @@
+import AppointmentForm from '@/components/AppointmentForm'
 import AppointmentOutcome from '@/components/AppointmentOutcome'
 import { requireStaffPage } from '@/lib/staff-access'
 import Header from '@/components/Header'
@@ -50,6 +51,7 @@ export default async function AppointmentDetail({ params }: { params: Promise<{ 
             <p><strong>Motivo:</strong> {item.reason ?? 'Sin motivo registrado'}</p>
             <p><strong>Notas:</strong> {item.notes ?? 'Sin notas'}</p>
           </div>
+          {item.status==='SCHEDULED'?<AppointmentForm id={item.id} initialDate={new Intl.DateTimeFormat('sv-SE',{timeZone:'America/Mexico_City',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(item.scheduledFor).replace(' ','T')}/>:null}
           <AppointmentOutcome id={item.id} status={item.status}/>
         </div>
       </div>

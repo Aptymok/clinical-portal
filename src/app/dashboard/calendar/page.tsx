@@ -1,3 +1,4 @@
+import { calendarCoverage } from '@/lib/calendar/coverage'
 import { requireStaffPage } from '@/lib/staff-access'
 import Link from 'next/link'
 import Header from '@/components/Header'
@@ -17,12 +18,12 @@ export default async function MasterCalendar() {
   const end = new Date(start.getTime()+14*86400000)
   const [local, external, sources, alerts, jobs] = await Promise.all([
     prisma.appointment.findMany({where:{scheduledFor:{gte:start,lt:end},status:'SCHEDULED'},include:{patient:{include:{person:true}}},orderBy:{scheduledFor:'asc'},take:500}),
-    prisma.canonicalCalendarEvent.findMany({where:{startsAt:{lt:end},endsAt:{gt:start},status:{not:'CANCELLED'}},orderBy:{startsAt:'asc'},include:{externalEvents:{select:{sourceId:true,externalEventId:true}}},take:500}),
-    prisma.calendarSource.findMany({where:{enabled:true},select:{id:true,name:true,providerType:true,readAuthority:true,writeAuthority:true,lastSyncAt:true,webhookEnabled:true,realtimeBookingCheck:true},orderBy:{id:'asc'}}),
+    prisma.canonicalCalendarEvent.findMany({where:{startsAt:{lt:end},endsAt:{gt:start},status:{not:'CANCELLED'},canonicalKey:{not:{startsWith:'appointment:'}}},orderBy:{startsAt:'asc'},include:{externalEvents:{select:{sourceId:true,externalEventId:true}}},take:500}),
+    prisma.calendarSource.findMany({select:{enabled:true,id:true,name:true,providerType:true,readAuthority:true,writeAuthority:true,lastSyncAt:true,webhookEnabled:true,realtimeBookingCheck:true,config:true},orderBy:{id:'asc'}}),
     prisma.calendarAlert.findMany({where:{status:'OPEN'},orderBy:{createdAt:'desc'},take:12}),
     prisma.calendarPropagationJob.count({where:{state:{in:['PENDING','FAILED','SENT','SKIPPED']}}})
   ])
-  const coverage = sources.length > 0 && sources.every(s => s.readAuthority && s.lastSyncAt && (s.providerType!=='GOOGLE_CALENDAR'||s.webhookEnabled))
+  const coverage = calendarCoverage(sources).verified
   const rows = [
     ...local.map(a=>({id:'local-'+a.id,date:a.scheduledFor,kind:'Cita clínica',name:[a.patient.person.firstName,a.patient.person.lastName].join(' '),source:'Portal interno',conflict:false,detail:a.reason||'Consulta',href:'/appointments/'+a.id})),
     ...external.map(e=>({id:'ext-'+e.id,date:e.startsAt,kind:e.status==='TENTATIVE'?'Tentativo':'Ocupación externa',name:'Reservado',source:e.externalEvents.map(l=>l.sourceId).join(', ')||e.sourceOfTruthId||'Fuente por determinar',conflict:e.conflict,detail:'No se muestran datos de pacientes externos',href:null as string|null}))

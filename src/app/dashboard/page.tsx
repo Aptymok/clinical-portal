@@ -1,3 +1,4 @@
+import { calendarCoverage } from '@/lib/calendar/coverage'
 import OperationsOverview from '@/components/OperationsOverview'
 import { requireStaffPage } from '@/lib/staff-access'
 import Link from 'next/link'
@@ -21,10 +22,10 @@ export default async function Dashboard() {
   prisma.patient.count(),
   prisma.canonicalCalendarEvent.findMany({where:{startsAt:{gte:todayStart,lt:tomorrow},status:{not:'CANCELLED'}},orderBy:{startsAt:'asc'},take:40}),
   prisma.canonicalCalendarEvent.findMany({where:{startsAt:{gte:now,lte:nextWeek},status:{not:'CANCELLED'}},orderBy:{startsAt:'asc'},take:80}),
-  prisma.calendarSource.findMany({where:{enabled:true},select:{id:true,name:true,readAuthority:true,lastSyncAt:true,providerType:true,webhookEnabled:true}}),
+  prisma.calendarSource.findMany({select:{enabled:true,id:true,name:true,readAuthority:true,lastSyncAt:true,providerType:true,webhookEnabled:true,config:true}}),
   prisma.calendarAlert.count({where:{status:'OPEN'}})
  ])
- const coverageReady=calendarSources.length>0&&calendarSources.every(s=>s.readAuthority&&s.lastSyncAt&&(s.providerType!=='GOOGLE_CALENDAR'||s.webhookEnabled))
+ const coverageReady=calendarCoverage(calendarSources).verified
  const time=(date:Date)=>new Intl.DateTimeFormat('es-MX',{timeZone:'America/Mexico_City',weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}).format(date)
  return <><Header/><main className="container page">
  <p className="eyebrow">INMUNOCLINIC · ÁREA PROFESIONAL</p>
