@@ -1,3 +1,8 @@
+/**
+ * @param {string | undefined} raw
+ * @param {Record<string, string | undefined>} [env]
+ * @returns {string | undefined}
+ */
 export function databaseUrl(raw, env = process.env) {
   if (!raw) return undefined;
   try {
