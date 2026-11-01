@@ -1,4 +1,6 @@
-import { calendarCoverage } from '@/lib/calendar/coverage'
+import { calendarCoverage, MAX_OBSERVATION_AGE_MS } from '@/lib/calendar/coverage'
+import CalendarSlotGrid from '@/components/CalendarSlotGrid'
+import type { CalendarDisplayEvent } from '@/lib/calendar/slot-view'
 import { requireStaffPage } from '@/lib/staff-access'
 import Link from 'next/link'
 import Header from '@/components/Header'
@@ -16,14 +18,28 @@ export default async function MasterCalendar() {
   const now = new Date()
   const start = new Date(dayFmt.format(now)+'T00:00:00-06:00')
   const end = new Date(start.getTime()+14*86400000)
-  const [local, external, sources, alerts, jobs] = await Promise.all([
-    prisma.appointment.findMany({where:{scheduledFor:{gte:start,lt:end},status:'SCHEDULED'},include:{patient:{include:{person:true}}},orderBy:{scheduledFor:'asc'},take:500}),
-    prisma.canonicalCalendarEvent.findMany({where:{startsAt:{lt:end},endsAt:{gt:start},status:{not:'CANCELLED'},canonicalKey:{not:{startsWith:'appointment:'}}},orderBy:{startsAt:'asc'},include:{externalEvents:{select:{sourceId:true,externalEventId:true}}},take:500}),
+  const providerId = process.env.CALENDAR_INTERNAL_PROVIDER_ID || '__unconfigured__'
+  const providerRef = process.env.CALENDAR_PROVIDER_REF || 'dr-guillermo'
+  const [local, canonical, sources, alerts, jobs, disputed, provider] = await Promise.all([
+    prisma.appointment.findMany({where:{providerId,scheduledFor:{gte:new Date(+start-30*60000),lt:end},status:'SCHEDULED'},include:{patient:{include:{person:true}}},orderBy:{scheduledFor:'asc'},take:501}),
+    prisma.canonicalCalendarEvent.findMany({where:{providerRef,startsAt:{lt:end},endsAt:{gt:start},status:{not:'CANCELLED'}},orderBy:{startsAt:'asc'},include:{externalEvents:{select:{sourceId:true,externalEventId:true}}},take:501}),
     prisma.calendarSource.findMany({select:{enabled:true,id:true,name:true,providerType:true,readAuthority:true,writeAuthority:true,lastSyncAt:true,webhookEnabled:true,realtimeBookingCheck:true,config:true},orderBy:{id:'asc'}}),
     prisma.calendarAlert.findMany({where:{status:'OPEN'},orderBy:{createdAt:'desc'},take:12}),
-    prisma.calendarPropagationJob.count({where:{state:{in:['PENDING','FAILED','SENT','SKIPPED']}}})
+    prisma.calendarPropagationJob.count({where:{state:{in:['PENDING','FAILED','SENT','SKIPPED']}}}),
+    prisma.calendarExternalEvent.findMany({where:{providerRef,startsAt:{lt:end},endsAt:{gt:start},status:{not:'CANCELLED'},canonicalEvent:{conflict:true}},select:{id:true,startsAt:true,endsAt:true,sourceId:true},take:501}),
+    prisma.provider.findUnique({where:{id:providerId},select:{id:true}})
   ])
+  const localKeys = new Set(local.map(appointment=>`appointment:${appointment.id}`))
+  const external = canonical.filter(event=>!localKeys.has(event.canonicalKey))
   const coverage = calendarCoverage(sources).verified
+  const truncated = [local,canonical,disputed].some(items=>items.length>500)
+  const verifiedUntil = coverage && provider && !truncated ? Math.min(...sources.filter(s=>s.providerType!=='CLINICAL_PORTAL').map(s=>Math.min(+s.lastSyncAt+MAX_OBSERVATION_AGE_MS,s.providerType==='GOOGLE_CALENDAR'?Number((s.config as {watchExpiration?:string})?.watchExpiration||0):Infinity))) : 0
+  const sourceNames = new Map(sources.map(source=>[source.id,source.name]))
+  const displayEvents: CalendarDisplayEvent[] = [
+    ...local.map(a=>({id:'local-'+a.id,startsAt:a.scheduledFor.toISOString(),endsAt:new Date(+a.scheduledFor+SLOT_MINUTES*60000).toISOString(),title:[a.patient.person.firstName,a.patient.person.lastName].join(' '),source:'Portal interno',conflict:false,href:'/appointments/'+a.id})),
+    ...external.map(e=>({id:'external-'+e.id,startsAt:e.startsAt.toISOString(),endsAt:e.endsAt.toISOString(),title:'Ocupación externa',source:e.externalEvents.map(item=>sourceNames.get(item.sourceId)||item.sourceId).join(', ')||'Fuente externa',conflict:e.conflict})),
+    ...disputed.map(e=>({id:'disputed-'+e.id,startsAt:e.startsAt.toISOString(),endsAt:e.endsAt.toISOString(),title:'Ocupación con discrepancia',source:sourceNames.get(e.sourceId)||e.sourceId,conflict:true}))
+  ]
   const rows = [
     ...local.map(a=>({id:'local-'+a.id,date:a.scheduledFor,kind:'Cita clínica',name:[a.patient.person.firstName,a.patient.person.lastName].join(' '),source:'Portal interno',conflict:false,detail:a.reason||'Consulta',href:'/appointments/'+a.id})),
     ...external.map(e=>({id:'ext-'+e.id,date:e.startsAt,kind:e.status==='TENTATIVE'?'Tentativo':'Ocupación externa',name:'Reservado',source:e.externalEvents.map(l=>l.sourceId).join(', ')||e.sourceOfTruthId||'Fuente por determinar',conflict:e.conflict,detail:'No se muestran datos de pacientes externos',href:null as string|null}))
@@ -38,6 +54,7 @@ export default async function MasterCalendar() {
       <p>{coverage?'Cada fuente activa reporta lectura y una sincronización observada. Comprueba vigencia y alertas antes de confirmar reservas.':'Una o más fuentes no tienen lectura, sincronización inicial o canal requerido. Los espacios libres de esta pantalla NO son horarios disponibles.'}</p>
     </section>
     <div className="master-stats"><div><span>Citas internas</span><strong>{local.length}</strong></div><div><span>Ocupaciones externas</span><strong>{external.length}</strong></div><div><span>Conflictos detectados</span><strong>{external.filter(e=>e.conflict).length}</strong></div><div><span>Propagaciones sin cerrar</span><strong>{jobs}</strong></div></div>
+    <CalendarSlotGrid startDate={dayFmt.format(start)} events={displayEvents} verifiedUntil={verifiedUntil} pending={jobs>0||truncated} observedAt={+now}/>
     <div className="master-columns">
       <div className="master-main"><h2>Calendario consolidado</h2>{rows.length?Array.from(groups.entries()).map(([key,entries])=><section className="master-day" key={key}><h3>{new Intl.DateTimeFormat('es-MX',{timeZone:tz,weekday:'long',day:'numeric',month:'long'}).format(entries[0].date)}</h3><div className="master-events">{entries.map(item=><article key={item.id} className={'master-event '+(item.conflict?'master-conflict':'')}><time dateTime={item.date.toISOString()}>{fmt.format(item.date).split(', ').pop()}</time><div><strong>{item.kind} · {item.name}</strong><span>{item.source}</span><small>{item.conflict?'Conflicto: requiere resolución manual':item.detail}</small></div>{item.href?<Link href={item.href}>Ver cita →</Link>:null}</article>)}</div></section>):<div className="card"><h3>Sin eventos observados</h3><p>La ausencia de eventos no demuestra que exista disponibilidad. Valida las fuentes antes de agendar.</p></div>}</div>
       <aside className="master-side"><section className="card"><h2>Fuentes</h2>{sources.length?sources.map(s=><div className="master-source" key={s.id}><strong>{s.name}</strong><span>{s.readAuthority?'Lectura habilitada':'Lectura pendiente'} · {s.writeAuthority?'Escritura habilitada':'Escritura pendiente'}</span><small>{s.lastSyncAt?'Última observación '+fmt.format(s.lastSyncAt):'Sin sincronización registrada'}</small></div>):<p>No hay calendarios configurados.</p>}<Link href="/dashboard/calendar-integrations">Ver detalles →</Link></section>

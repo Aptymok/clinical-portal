@@ -29,12 +29,18 @@ const login=await request('/api/auth/callback/credentials',{method:'POST',header
 assert.ok([200,302,303].includes(login.status),'login status '+login.status);
 const session=await(await request('/api/auth/session')).json();
 assert.equal(session?.user?.role,'DOCTOR','credentials login must establish staff session');
-for(const path of ['/dashboard','/dashboard/discovery','/dashboard/calendar','/patients','/appointments','/documents']){const r=await request(path);assert.equal(r.status,200,path);const text=await r.text();assert.ok(!text.includes('No pudimos cargar esta información.'),path+' server error');console.log('STAFF_PAGE_OK',path)}
+for(const path of ['/dashboard','/dashboard/discovery','/dashboard/calendar','/patients','/appointments','/documents']){const r=await request(path);assert.equal(r.status,200,path);const text=await r.text();assert.ok(!text.includes('No pudimos cargar esta información.'),path+' server error');if(path==='/dashboard/calendar'){assert.ok(text.includes('Calendario por horarios'));assert.ok(text.includes('Sin verificar'));assert.ok(text.includes('Actualizar agenda'));assert.ok(!text.includes('slot-button slot-FREE'),'Missing source coverage must not render a free slot');}console.log('STAFF_PAGE_OK',path)}
 const saved=await request('/api/discovery',{method:'POST',headers:{'Content-Type':'application/json','Origin':base},body:JSON.stringify({sourceUrl:'https://example.test/qa-physician',field:'telephone',observedValue:'449 996 6500'})});
 assert.equal(saved.status,201,await saved.text());
 const reviewed=await request('/dashboard/discovery');
 assert.ok((await reviewed.text()).includes('example.test'));
 console.log('DISCOVERY_PERSISTED_AND_READ_BACK');
+const difference=await request('/api/discovery',{method:'POST',headers:{'Content-Type':'application/json','Origin':base},body:JSON.stringify({sourceUrl:'https://example.test/qa-difference',field:'telephone',observedValue:'000 000 0000'})});
+assert.equal(difference.status,201);
+const cleaning=await request('/dashboard/discovery');const cleaningHtml=await cleaning.text();
+assert.ok(cleaningHtml.includes('Preparar solicitud de corrección'));
+assert.ok(cleaningHtml.includes('Este texto no se ha enviado'));
+console.log('CLEANING_REQUEST_PREPARED_WITHOUT_FALSE_EXTERNAL_ACTION');
 const bad=await request('/api/discovery',{method:'POST',headers:{'Content-Type':'application/json','Origin':'https://other.test'},body:'{}'});assert.equal(bad.status,403);console.log('CROSS_ORIGIN_WRITE_DENIED');
 const outcome=await request('/api/appointments/'+appointment.id,{method:'PATCH',headers:{'Content-Type':'application/json','Origin':base},body:JSON.stringify({status:'COMPLETED'})});
 assert.equal(outcome.status,200);assert.equal((await outcome.json()).data.status,'COMPLETED');

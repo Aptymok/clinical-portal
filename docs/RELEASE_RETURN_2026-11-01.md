@@ -27,3 +27,11 @@ La corrección queda pendiente de integrar: otro avance de main dispara otro des
 ## Calendarios y operación ampliada
 
 Google necesita autorización efectiva y lectura inicial; Doctoralia necesita credenciales y observación completa; el tercer proveedor sigue sin identificar. El mantenimiento programado aún necesita sus secretos de GitHub. Los ensayos externos previos fueron simulados y no prueban sincronización de agendas reales. Tampoco se declaran cerrados los recordatorios externos, agentes autónomos ni correcciones de identidad en plataformas ajenas.
+
+## Segunda publicación autorizada por Juan
+
+Juan autorizó publicar la corrección y precisó que debe poder tocar el calendario para ver ocupación/disponibilidad; discovery y limpieza siguen siendo prioridades. Se añadió una cuadrícula navegable de dos semanas, bloques de treinta minutos, detalles de ocupación y actualización manual. Conserva lectura de citas, eventos canónicos y observaciones disputadas. Ningún bloque se certifica libre sin cobertura vigente, profesional existente, registros completos y entregas cerradas; la cobertura vence también en la pantalla abierta. Los horarios publicados de martes/jueves se respetan y el sábado requiere confirmación. No se hacen reservas desde esta cuadrícula.
+
+Discovery incorpora solicitudes de corrección que el personal puede desplegar y copiar para la plataforma correspondiente. No se envían ni declaran ejecutadas. Se conserva el registro de observaciones y la relectura para cerrar diferencias.
+
+Validación del candidato: chequeo de tipos aprobado, 37 pruebas unitarias, compilación de producción y pruebas HTTP/autenticación/persistencia con PGlite desechable. Las pruebas comprobaron la cuadrícula sin falsos bloques libres, observaciones guardadas, preparación de solicitudes sin falso envío, permisos y aislamiento de pacientes. No se introdujeron pacientes en producción. El resultado de esta segunda publicación y su Verify remoto debe observarse después de avanzar main; no se declara aún exitoso en este registro previo.
