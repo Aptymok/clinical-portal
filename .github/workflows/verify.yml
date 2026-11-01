@@ -41,6 +41,7 @@ jobs:
       - run: npm test -- --run
       - run: npm run build
       - run: npm run prisma:migrate:deploy
+      - run: node --import tsx scripts/verify-production-bootstrap.ts
       - run: node --import tsx scripts/verify-calendar-runtime.ts
       - name: Verify public routes, authentication, private access and persisted operations
         run: |

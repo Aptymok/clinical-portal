@@ -1,4 +1,5 @@
 import {createRequire} from 'node:module';
+import {databaseUrl} from '../src/lib/database-url.mjs';
 const errors=[];
 const secret=process.env.AUTH_SECRET||process.env.NEXTAUTH_SECRET||'';
 if(secret.length<32)errors.push('Configurar un secreto de autenticación de al menos 32 caracteres.');
@@ -7,7 +8,7 @@ if((process.env.CALENDAR_SYNC_SECRET||'').length<32)errors.push('Configurar el s
 if(process.env.NEXT_PUBLIC_SITE_URL!=='https://inmunoclinic.com')errors.push('Verificar la URL pública canónica.');
 if(!process.env.DATABASE_URL)errors.push('Vincular la base de datos destinada a la clínica.');
 if(!errors.length){
- const require=createRequire(import.meta.url);const {PrismaClient}=require('@prisma/client');const db=new PrismaClient();
+ const require=createRequire(import.meta.url);const {PrismaClient}=require('@prisma/client');const db=new PrismaClient({datasourceUrl:databaseUrl(process.env.DATABASE_URL)});
  try{
   await db.calendarSource.count();await db.calendarPropagationJob.count();await db.reminder.count();
   const staff=await db.user.count({where:{role:{in:['ADMIN','DOCTOR']},passwordHash:{not:null}}});
